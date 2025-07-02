@@ -102,19 +102,17 @@ export const useInvitations = (tripId?: string) => {
           console.log('Trip details:', trip);
 
           if (trip && userProfile) {
-            console.log('Calling edge function with data:', {
-              invitationId: invitation.id,
-              inviteEmail: inviteData.invite_value,
+            console.log('Calling email function with data:', {
+              to: inviteData.invite_value,
               tripTitle: trip.title,
               tripDestination: trip.destination,
               inviterName: userProfile.full_name || userProfile.email,
               invitationToken: invitation.invitation_token
             });
 
-            const emailResponse = await supabase.functions.invoke('send-invitation-email', {
+            const emailResponse = await supabase.functions.invoke('send-email', {
               body: {
-                invitationId: invitation.id,
-                inviteEmail: inviteData.invite_value,
+                to: inviteData.invite_value,
                 tripTitle: trip.title,
                 tripDestination: trip.destination,
                 inviterName: userProfile.full_name || userProfile.email,
@@ -122,7 +120,7 @@ export const useInvitations = (tripId?: string) => {
               }
             });
 
-            console.log('Edge function response:', emailResponse);
+            console.log('Email function response:', emailResponse);
 
             if (emailResponse.error) {
               console.error('Error sending email:', emailResponse.error);
