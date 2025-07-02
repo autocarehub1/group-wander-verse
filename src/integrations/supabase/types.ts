@@ -209,6 +209,73 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          edited_at: string | null
+          file_name: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          message_type: string
+          reply_to_message_id: string | null
+          sender_id: string
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          edited_at?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          message_type?: string
+          reply_to_message_id?: string | null
+          sender_id: string
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          edited_at?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          message_type?: string
+          reply_to_message_id?: string | null
+          sender_id?: string
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_reply_to_message_id_fkey"
+            columns: ["reply_to_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           created_at: string
@@ -263,26 +330,96 @@ export type Database = {
           },
         ]
       }
+      trip_invitations: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          invitation_token: string | null
+          invite_type: string
+          invite_value: string | null
+          invited_by: string
+          message: string | null
+          status: string
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invitation_token?: string | null
+          invite_type: string
+          invite_value?: string | null
+          invited_by: string
+          message?: string | null
+          status?: string
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invitation_token?: string | null
+          invite_type?: string
+          invite_value?: string | null
+          invited_by?: string
+          message?: string | null
+          status?: string
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_invitations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_participants: {
         Row: {
+          invitation_id: string | null
           joined_at: string | null
           role: string | null
+          status: string | null
           trip_id: string
           user_id: string
         }
         Insert: {
+          invitation_id?: string | null
           joined_at?: string | null
           role?: string | null
+          status?: string | null
           trip_id: string
           user_id: string
         }
         Update: {
+          invitation_id?: string | null
           joined_at?: string | null
           role?: string | null
+          status?: string | null
           trip_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "trip_participants_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "trip_invitations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trip_participants_trip_id_fkey"
             columns: ["trip_id"]
@@ -303,8 +440,10 @@ export type Database = {
         Row: {
           created_at: string | null
           created_by: string | null
+          description: string | null
           destination: string
           end_date: string | null
+          group_settings: Json | null
           id: string
           image_url: string | null
           start_date: string | null
@@ -315,8 +454,10 @@ export type Database = {
         Insert: {
           created_at?: string | null
           created_by?: string | null
+          description?: string | null
           destination: string
           end_date?: string | null
+          group_settings?: Json | null
           id?: string
           image_url?: string | null
           start_date?: string | null
@@ -327,8 +468,10 @@ export type Database = {
         Update: {
           created_at?: string | null
           created_by?: string | null
+          description?: string | null
           destination?: string
           end_date?: string | null
+          group_settings?: Json | null
           id?: string
           image_url?: string | null
           start_date?: string | null
