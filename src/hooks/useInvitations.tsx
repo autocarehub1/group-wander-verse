@@ -67,7 +67,7 @@ export const useInvitations = (tripId?: string) => {
     if (!user || !tripId) return null;
 
     try {
-      const { data, error } = await supabase
+      const { data: invitation, error } = await supabase
         .from('trip_invitations')
         .insert([{
           trip_id: tripId,
@@ -79,6 +79,56 @@ export const useInvitations = (tripId?: string) => {
 
       if (error) throw error;
 
+      // Send email invitation if it's an email type
+      if (inviteData.invite_type === 'email' && inviteData.invite_value && invitation.invitation_token) {
+        try {
+          // Get user profile for inviter name
+          const { data: userProfile } = await supabase
+            .from('users')
+            .select('full_name, email')
+            .eq('id', user.id)
+            .single();
+
+          // Get trip details
+          const { data: trip } = await supabase
+            .from('trips')
+            .select('title, destination')
+            .eq('id', tripId)
+            .single();
+
+          if (trip && userProfile) {
+            const emailResponse = await supabase.functions.invoke('send-invitation-email', {
+              body: {
+                invitationId: invitation.id,
+                inviteEmail: inviteData.invite_value,
+                tripTitle: trip.title,
+                tripDestination: trip.destination,
+                inviterName: userProfile.full_name || userProfile.email,
+                invitationToken: invitation.invitation_token
+              }
+            });
+
+            if (emailResponse.error) {
+              console.error('Error sending email:', emailResponse.error);
+              toast({
+                title: "Invitation created but email failed",
+                description: "The invitation was created but we couldn't send the email. Please share the invitation link manually.",
+                variant: "destructive"
+              });
+            } else {
+              console.log('Email sent successfully:', emailResponse.data);
+            }
+          }
+        } catch (emailError) {
+          console.error('Email sending error:', emailError);
+          toast({
+            title: "Invitation created but email failed",
+            description: "The invitation was created but we couldn't send the email. Please share the invitation link manually.",
+            variant: "destructive"
+          });
+        }
+      }
+
       await fetchInvitations();
       
       toast({
@@ -86,7 +136,7 @@ export const useInvitations = (tripId?: string) => {
         description: `Invitation has been sent via ${inviteData.invite_type}.`
       });
 
-      return data;
+      return invitation;
     } catch (error: any) {
       toast({
         title: "Error sending invitation",
