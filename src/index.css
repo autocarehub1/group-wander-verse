@@ -6,62 +6,62 @@
 
 @layer base {
   :root {
-    /* Core travel-inspired palette */
-    --background: 210 100% 98%;
-    --foreground: 220 13% 13%;
+    /* Sharp, high-contrast palette */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 13%;
+    --card-foreground: 0 0% 3%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 13%;
+    --popover-foreground: 0 0% 3%;
 
-    /* Ocean blues - primary travel color */
-    --primary: 197 100% 45%;
+    /* Electric blue - primary sharp color */
+    --primary: 220 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 197 100% 65%;
+    --primary-glow: 220 100% 60%;
 
-    /* Sky blues - secondary */
-    --secondary: 200 100% 95%;
-    --secondary-foreground: 197 100% 35%;
+    /* Sharp gray - secondary */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    /* Warm sand - muted tones */
-    --muted: 45 20% 96%;
-    --muted-foreground: 220 13% 46%;
+    /* Neutral tones */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Sunset orange - accent */
-    --accent: 25 100% 85%;
-    --accent-foreground: 25 100% 25%;
+    /* Vibrant accent */
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
-    /* Adventure red - destructive */
-    --destructive: 0 75% 55%;
+    /* Sharp red - destructive */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Subtle borders */
-    --border: 200 20% 88%;
-    --input: 200 20% 88%;
-    --ring: 197 100% 45%;
+    /* Sharp borders */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 220 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Travel-specific colors */
-    --adventure: 15 100% 60%;
+    /* Sharp theme colors */
+    --adventure: 12 100% 60%;
     --adventure-foreground: 0 0% 100%;
-    --nature: 120 40% 45%;
+    --nature: 142 76% 45%;
     --nature-foreground: 0 0% 100%;
-    --cultural: 280 60% 55%;
+    --cultural: 271 100% 60%;
     --cultural-foreground: 0 0% 100%;
 
-    /* Beautiful gradients */
-    --gradient-ocean: linear-gradient(135deg, hsl(197 100% 45%), hsl(210 100% 60%));
-    --gradient-sunset: linear-gradient(135deg, hsl(25 100% 65%), hsl(15 100% 60%));
-    --gradient-sky: linear-gradient(180deg, hsl(200 100% 95%), hsl(210 100% 98%));
-    --gradient-hero: linear-gradient(135deg, hsl(197 100% 45%) 0%, hsl(210 100% 60%) 50%, hsl(25 100% 65%) 100%);
+    /* Sharp gradients */
+    --gradient-ocean: linear-gradient(135deg, hsl(220 100% 50%), hsl(240 100% 60%));
+    --gradient-sunset: linear-gradient(135deg, hsl(12 100% 60%), hsl(271 100% 60%));
+    --gradient-sky: linear-gradient(180deg, hsl(0 0% 98%), hsl(0 0% 100%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 100% 50%) 0%, hsl(271 100% 60%) 50%, hsl(12 100% 60%) 100%);
 
-    /* Elegant shadows */
-    --shadow-travel: 0 10px 30px -10px hsl(197 100% 45% / 0.3);
-    --shadow-card: 0 4px 20px -4px hsl(220 13% 13% / 0.1);
-    --shadow-glow: 0 0 40px hsl(197 100% 65% / 0.4);
+    /* Sharp shadows */
+    --shadow-travel: 0 8px 25px -8px hsl(220 100% 50% / 0.4);
+    --shadow-card: 0 2px 10px -2px hsl(0 0% 3% / 0.1);
+    --shadow-glow: 0 0 30px hsl(220 100% 60% / 0.5);
 
     /* Smooth animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
