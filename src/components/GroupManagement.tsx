@@ -239,10 +239,14 @@ export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupMan
       
       <CardContent>
         <Tabs defaultValue="chat" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="chat">
               <MessageCircle className="h-4 w-4 mr-2" />
               Group Chat
+            </TabsTrigger>
+            <TabsTrigger value="planner">
+              <MapPin className="h-4 w-4 mr-2" />
+              Trip Planner
             </TabsTrigger>
             <TabsTrigger value="participants">
               Participants ({participants.length})
@@ -254,6 +258,10 @@ export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupMan
           
           <TabsContent value="chat" className="mt-6">
             <GroupChat tripId={tripId} tripTitle={tripTitle} />
+          </TabsContent>
+          
+          <TabsContent value="planner" className="mt-6">
+            <TripPlanner tripId={tripId} tripTitle={tripTitle} tripDestination={tripDestination} />
           </TabsContent>
           
           <TabsContent value="participants" className="space-y-4">
