@@ -129,12 +129,31 @@ export const useInvitations = (tripId?: string) => {
                 description: "The invitation was created but we couldn't send the email. Please share the invitation link manually.",
                 variant: "destructive"
               });
-            } else {
-              console.log('Email sent successfully:', emailResponse.data);
-              toast({
-                title: "Email sent successfully",
-                description: `Invitation email has been sent to ${inviteData.invite_value}.`
-              });
+            } else if (emailResponse.data) {
+              const responseData = emailResponse.data;
+              
+              if (responseData.method === "EmailJS") {
+                console.log('Email sent successfully via EmailJS');
+                toast({
+                  title: "Email sent successfully",
+                  description: `Invitation email has been sent to ${inviteData.invite_value}.`
+                });
+              } else if (responseData.method === "mailto_fallback") {
+                console.log('Using mailto fallback');
+                toast({
+                  title: "Invitation created",
+                  description: `Invitation link: ${responseData.invitationLink}`,
+                });
+                
+                // Copy the invitation link to clipboard
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(responseData.invitationLink);
+                  toast({
+                    title: "Link copied to clipboard",
+                    description: "Share this link with the person you want to invite."
+                  });
+                }
+              }
             }
           } else {
             console.error('Missing trip or user profile data');

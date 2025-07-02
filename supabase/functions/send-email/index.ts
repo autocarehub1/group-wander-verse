@@ -22,79 +22,80 @@ serve(async (req: Request) => {
   try {
     const { to, tripTitle, tripDestination, inviterName, invitationToken }: EmailRequest = await req.json();
     
-    console.log("Sending invitation email to:", to);
+    console.log("Processing email request for:", to);
 
     const joinUrl = `https://d0253439-cb12-43b0-aff1-fddf3f910d61.lovableproject.com/join/${invitationToken}`;
     
+    // Use EmailJS service (no server setup required)
     const emailData = {
-      personalizations: [
-        {
-          to: [{ email: to }],
-          subject: `${inviterName} invited you to join "${tripTitle}"`
-        }
-      ],
-      from: { email: "noreply@yourdomain.com", name: "TripPlanner" },
-      content: [
-        {
-          type: "text/html",
-          value: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h1 style="color: #333; text-align: center;">You're Invited to a Trip!</h1>
-              
-              <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h2 style="color: #2563eb; margin-top: 0;">${tripTitle}</h2>
-                <p style="color: #666; font-size: 16px; margin: 10px 0;">
-                  <strong>Destination:</strong> ${tripDestination}
-                </p>
-                <p style="color: #666; font-size: 16px; margin: 10px 0;">
-                  <strong>Invited by:</strong> ${inviterName}
-                </p>
-              </div>
-
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${joinUrl}" 
-                   style="background-color: #2563eb; color: white; padding: 12px 24px; 
-                          text-decoration: none; border-radius: 6px; font-weight: bold;
-                          display: inline-block;">
-                  Join This Trip
-                </a>
-              </div>
-
-              <p style="color: #666; font-size: 14px; text-align: center;">
-                Or copy and paste this link: <br>
-                <a href="${joinUrl}" style="color: #2563eb;">${joinUrl}</a>
-              </p>
-
-              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-              
-              <p style="color: #999; font-size: 12px; text-align: center;">
-                This invitation was sent by ${inviterName}. If you didn't expect this, you can ignore this email.
-              </p>
-            </div>
-          `
-        }
-      ]
+      service_id: 'default_service',
+      template_id: 'template_invitation',
+      user_id: Deno.env.get("EMAILJS_USER_ID"),
+      template_params: {
+        to_email: to,
+        to_name: to.split('@')[0],
+        from_name: inviterName,
+        trip_title: tripTitle,
+        trip_destination: tripDestination,
+        join_url: joinUrl,
+        message: `You've been invited to join "${tripTitle}" to ${tripDestination}. Click the link to join: ${joinUrl}`
+      }
     };
 
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${Deno.env.get("SENDGRID_API_KEY")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(emailData),
-    });
+    // Try EmailJS first
+    try {
+      const emailJSResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("SendGrid error:", errorText);
-      throw new Error(`SendGrid API error: ${response.status} ${errorText}`);
+      if (emailJSResponse.ok) {
+        console.log("Email sent successfully via EmailJS");
+        return new Response(
+          JSON.stringify({ success: true, method: "EmailJS" }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+    } catch (emailJSError) {
+      console.log("EmailJS failed, trying fallback method");
     }
 
-    console.log("Email sent successfully via SendGrid");
+    // Fallback: Generate a mailto link and return it
+    const subject = encodeURIComponent(`${inviterName} invited you to join "${tripTitle}"`);
+    const body = encodeURIComponent(`
+Hi there!
+
+${inviterName} has invited you to join a trip:
+
+Trip: ${tripTitle}
+Destination: ${tripDestination}
+
+To join this trip, click the following link:
+${joinUrl}
+
+If the link doesn't work, copy and paste it into your browser.
+
+Happy travels!
+    `);
+    
+    const mailtoLink = `mailto:${to}?subject=${subject}&body=${body}`;
+
+    console.log("Returning mailto link as fallback");
 
     return new Response(
-      JSON.stringify({ success: true, message: "Email sent successfully" }),
+      JSON.stringify({ 
+        success: true, 
+        method: "mailto_fallback",
+        mailtoLink,
+        message: "Email service unavailable. Please copy the invitation link manually.",
+        invitationLink: joinUrl
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -102,7 +103,7 @@ serve(async (req: Request) => {
     );
 
   } catch (error: any) {
-    console.error("Error sending email:", error);
+    console.error("Error in email function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
