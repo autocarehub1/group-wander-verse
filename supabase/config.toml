@@ -1,1 +1,12 @@
 project_id = "dtfzuoijnbvrgwjoxcfq"
+
+[api]
+enabled = true
+port = 54321
+
+[functions]
+enabled = true
+port = 54322
+
+[functions.send-invitation-email]
+verify_jwt = true

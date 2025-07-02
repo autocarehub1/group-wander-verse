@@ -82,6 +82,8 @@ export const useInvitations = (tripId?: string) => {
       // Send email invitation if it's an email type
       if (inviteData.invite_type === 'email' && inviteData.invite_value && invitation.invitation_token) {
         try {
+          console.log('Attempting to send email invitation...');
+          
           // Get user profile for inviter name
           const { data: userProfile } = await supabase
             .from('users')
@@ -96,7 +98,19 @@ export const useInvitations = (tripId?: string) => {
             .eq('id', tripId)
             .single();
 
+          console.log('User profile:', userProfile);
+          console.log('Trip details:', trip);
+
           if (trip && userProfile) {
+            console.log('Calling edge function with data:', {
+              invitationId: invitation.id,
+              inviteEmail: inviteData.invite_value,
+              tripTitle: trip.title,
+              tripDestination: trip.destination,
+              inviterName: userProfile.full_name || userProfile.email,
+              invitationToken: invitation.invitation_token
+            });
+
             const emailResponse = await supabase.functions.invoke('send-invitation-email', {
               body: {
                 invitationId: invitation.id,
@@ -108,6 +122,8 @@ export const useInvitations = (tripId?: string) => {
               }
             });
 
+            console.log('Edge function response:', emailResponse);
+
             if (emailResponse.error) {
               console.error('Error sending email:', emailResponse.error);
               toast({
@@ -117,7 +133,13 @@ export const useInvitations = (tripId?: string) => {
               });
             } else {
               console.log('Email sent successfully:', emailResponse.data);
+              toast({
+                title: "Email sent successfully",
+                description: `Invitation email has been sent to ${inviteData.invite_value}.`
+              });
             }
+          } else {
+            console.error('Missing trip or user profile data');
           }
         } catch (emailError) {
           console.error('Email sending error:', emailError);
@@ -127,6 +149,12 @@ export const useInvitations = (tripId?: string) => {
             variant: "destructive"
           });
         }
+      } else {
+        console.log('Not sending email - conditions not met:', {
+          type: inviteData.invite_type,
+          hasValue: !!inviteData.invite_value,
+          hasToken: !!invitation.invitation_token
+        });
       }
 
       await fetchInvitations();
