@@ -18,7 +18,7 @@ interface InvitationEmailRequest {
   invitationToken: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+serve(async (req: Request): Promise<Response> => {
   console.log('Edge function called with method:', req.method);
   
   // Handle CORS preflight requests
@@ -28,6 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log('Processing invitation email request...');
     const { invitationId, inviteEmail, tripTitle, tripDestination, inviterName, invitationToken }: InvitationEmailRequest = await req.json();
     
     console.log('Sending invitation email:', { invitationId, inviteEmail, tripTitle });
@@ -96,6 +97,4 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   }
-};
-
-serve(handler);
+});
