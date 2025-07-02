@@ -13,7 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useParticipants } from '@/hooks/useParticipants';
 import { useInvitations } from '@/hooks/useInvitations';
-import { Users, UserPlus, Link, MoreHorizontal, Crown, Shield } from 'lucide-react';
+import { GroupChat } from './GroupChat';
+import { Users, UserPlus, Link, MoreHorizontal, Crown, Shield, MessageCircle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface GroupManagementProps {
@@ -236,8 +237,12 @@ export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupMan
       </CardHeader>
       
       <CardContent>
-        <Tabs defaultValue="participants" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="chat" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="chat">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Group Chat
+            </TabsTrigger>
             <TabsTrigger value="participants">
               Participants ({participants.length})
             </TabsTrigger>
@@ -245,6 +250,10 @@ export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupMan
               Invitations ({invitations.filter(i => i.status === 'pending').length})
             </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="chat" className="mt-6">
+            <GroupChat tripId={tripId} tripTitle={tripTitle} />
+          </TabsContent>
           
           <TabsContent value="participants" className="space-y-4">
             {participantsLoading ? (
