@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Trips from "./pages/Trips";
+import JoinTrip from "./pages/JoinTrip";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +46,12 @@ const App = () => (
                 <Profile />
               </ProtectedRoute>
             } />
+            <Route path="/trips" element={
+              <ProtectedRoute>
+                <Trips />
+              </ProtectedRoute>
+            } />
+            <Route path="/join/:token" element={<JoinTrip />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -552,6 +552,10 @@ export type Database = {
         Args: { request_id: string }
         Returns: undefined
       }
+      accept_trip_invitation: {
+        Args: { invitation_token: string }
+        Returns: Json
+      }
       check_trip_ownership: {
         Args: { trip_uuid: string; user_uuid: string }
         Returns: boolean
