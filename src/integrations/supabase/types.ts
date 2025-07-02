@@ -209,6 +209,60 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          created_at: string
+          id: string
+          location_name: string
+          photos: Json | null
+          rating: number
+          review_text: string | null
+          review_type: string | null
+          trip_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_name: string
+          photos?: Json | null
+          rating: number
+          review_text?: string | null
+          review_type?: string | null
+          trip_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_name?: string
+          photos?: Json | null
+          rating?: number
+          review_text?: string | null
+          review_type?: string | null
+          trip_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_participants: {
         Row: {
           joined_at: string | null
@@ -294,27 +348,54 @@ export type Database = {
       }
       users: {
         Row: {
+          accessibility_needs: Json | null
           avatar_url: string | null
+          bio: string | null
           created_at: string | null
+          date_of_birth: string | null
+          dietary_restrictions: Json | null
           email: string
+          emergency_contact: Json | null
           full_name: string | null
           id: string
+          notification_preferences: Json | null
+          phone: string | null
+          privacy_settings: Json | null
+          travel_preferences: Json | null
           updated_at: string | null
         }
         Insert: {
+          accessibility_needs?: Json | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
+          dietary_restrictions?: Json | null
           email: string
+          emergency_contact?: Json | null
           full_name?: string | null
           id: string
+          notification_preferences?: Json | null
+          phone?: string | null
+          privacy_settings?: Json | null
+          travel_preferences?: Json | null
           updated_at?: string | null
         }
         Update: {
+          accessibility_needs?: Json | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
+          dietary_restrictions?: Json | null
           email?: string
+          emergency_contact?: Json | null
           full_name?: string | null
           id?: string
+          notification_preferences?: Json | null
+          phone?: string | null
+          privacy_settings?: Json | null
+          travel_preferences?: Json | null
           updated_at?: string | null
         }
         Relationships: []
