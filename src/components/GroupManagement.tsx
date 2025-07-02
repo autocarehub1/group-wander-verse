@@ -14,7 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useParticipants } from '@/hooks/useParticipants';
 import { useInvitations } from '@/hooks/useInvitations';
 import { GroupChat } from './GroupChat';
-import { Users, UserPlus, Link, MoreHorizontal, Crown, Shield, MessageCircle } from 'lucide-react';
+import { TripPlanner } from './trip-planner/TripPlanner';
+import { Users, UserPlus, Link, MoreHorizontal, Crown, Shield, MessageCircle, MapPin } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface GroupManagementProps {
