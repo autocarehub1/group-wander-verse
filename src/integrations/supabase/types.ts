@@ -564,6 +564,10 @@ export type Database = {
         Args: { trip_uuid: string }
         Returns: boolean
       }
+      is_trip_participant_check: {
+        Args: { trip_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
