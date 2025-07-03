@@ -10,6 +10,8 @@ import Profile from "./pages/Profile";
 import Trips from "./pages/Trips";
 import JoinTrip from "./pages/JoinTrip";
 import NotFound from "./pages/NotFound";
+import ExpenseTracking from "./pages/ExpenseTracking";
+import ExpensePayments from "./pages/ExpensePayments";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,16 @@ const App = () => (
             <Route path="/trips" element={
               <ProtectedRoute>
                 <Trips />
+              </ProtectedRoute>
+            } />
+            <Route path="/expense-tracking" element={
+              <ProtectedRoute>
+                <ExpenseTracking />
+              </ProtectedRoute>
+            } />
+            <Route path="/expense-payments" element={
+              <ProtectedRoute>
+                <ExpensePayments />
               </ProtectedRoute>
             } />
             <Route path="/join/:token" element={<JoinTrip />} />

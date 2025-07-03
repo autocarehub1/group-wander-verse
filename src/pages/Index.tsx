@@ -50,7 +50,7 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link to="/trips">
+                <Link to="/expense-payments">
                   <Button variant="outline" className="w-full">Manage Expenses</Button>
                 </Link>
               </CardContent>
@@ -118,7 +118,7 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link to="/trips">
+                <Link to="/expense-tracking">
                   <Button variant="outline" className="w-full">Track Expenses</Button>
                 </Link>
               </CardContent>
