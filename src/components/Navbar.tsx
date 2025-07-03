@@ -39,6 +39,11 @@ const Navbar = () => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors">
               Dashboard
             </Link>
+            {user && (
+              <Link to="/trips" className="text-foreground hover:text-primary transition-colors">
+                My Trips
+              </Link>
+            )}
             <a href="#features" className="text-foreground hover:text-primary transition-colors">
               Features
             </a>
@@ -112,6 +117,15 @@ const Navbar = () => {
               >
                 Dashboard
               </Link>
+              {user && (
+                <Link
+                  to="/trips"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  My Trips
+                </Link>
+              )}
               <a
                 href="#features"
                 className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
