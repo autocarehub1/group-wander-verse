@@ -39,8 +39,19 @@ const JoinTrip = () => {
 
   useEffect(() => {
     const fetchInvitation = async () => {
-      if (!token) {
-        setError('Invalid invitation link');
+      // Extract token from URL params
+      const urlToken = token || window.location.pathname.split('/').pop();
+      
+      if (!urlToken || urlToken === ':token' || urlToken === 'join') {
+        setError('Invalid invitation link - please check the URL');
+        setLoading(false);
+        return;
+      }
+
+      // Validate that token looks like a UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(urlToken)) {
+        setError('Invalid invitation token format');
         setLoading(false);
         return;
       }
@@ -53,7 +64,7 @@ const JoinTrip = () => {
             inviter:users!trip_invitations_invited_by_fkey(full_name, email),
             trip:trips(title, destination, description, start_date, end_date)
           `)
-          .eq('invitation_token', token)
+          .eq('invitation_token', urlToken)
           .single();
 
         if (error) throw error;
@@ -85,11 +96,12 @@ const JoinTrip = () => {
   }, [token]);
 
   const handleAcceptInvitation = async () => {
-    if (!token || !user) return;
+    const urlToken = token || window.location.pathname.split('/').pop();
+    if (!urlToken || !user) return;
 
     setProcessing(true);
     try {
-      const tripId = await acceptInvitation(token);
+      const tripId = await acceptInvitation(urlToken);
       if (tripId) {
         navigate('/trips');
       }
