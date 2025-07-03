@@ -10,3 +10,9 @@ port = 54322
 
 [functions.send-email]
 verify_jwt = true
+
+[functions.create-expense-payment]
+verify_jwt = true
+
+[functions.verify-expense-payment]
+verify_jwt = true

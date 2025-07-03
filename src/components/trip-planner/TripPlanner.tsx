@@ -3,8 +3,9 @@ import { ItineraryPlanner } from './ItineraryPlanner';
 import { ActivitySuggestions } from './ActivitySuggestions';
 import { AccommodationPlanning } from './AccommodationPlanning';
 import { ExpenseTracker } from './ExpenseTracker';
+import { ExpenseSettlement } from './ExpenseSettlement';
 import { DocumentManager } from './DocumentManager';
-import { Calendar, MapPin, Bed, DollarSign, FileText } from 'lucide-react';
+import { Calendar, MapPin, Bed, DollarSign, FileText, CreditCard } from 'lucide-react';
 
 interface TripPlannerProps {
   tripId: string;
@@ -16,7 +17,7 @@ export const TripPlanner = ({ tripId, tripTitle, tripDestination }: TripPlannerP
   return (
     <div className="w-full">
       <Tabs defaultValue="itinerary" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="itinerary">
             <Calendar className="h-4 w-4 mr-2" />
             Itinerary
@@ -32,6 +33,10 @@ export const TripPlanner = ({ tripId, tripTitle, tripDestination }: TripPlannerP
           <TabsTrigger value="expenses">
             <DollarSign className="h-4 w-4 mr-2" />
             Expenses
+          </TabsTrigger>
+          <TabsTrigger value="payments">
+            <CreditCard className="h-4 w-4 mr-2" />
+            Payments
           </TabsTrigger>
           <TabsTrigger value="documents">
             <FileText className="h-4 w-4 mr-2" />
@@ -53,6 +58,10 @@ export const TripPlanner = ({ tripId, tripTitle, tripDestination }: TripPlannerP
         
         <TabsContent value="expenses" className="mt-6">
           <ExpenseTracker tripId={tripId} />
+        </TabsContent>
+        
+        <TabsContent value="payments" className="mt-6">
+          <ExpenseSettlement tripId={tripId} />
         </TabsContent>
         
         <TabsContent value="documents" className="mt-6">

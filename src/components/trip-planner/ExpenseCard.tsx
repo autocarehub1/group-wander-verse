@@ -1,7 +1,9 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Receipt, Users } from 'lucide-react';
+import { Receipt, Users, Check, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TripExpense {
   id: string;
@@ -23,7 +25,51 @@ interface ExpenseCardProps {
   expense: TripExpense;
 }
 
+interface ExpenseSplit {
+  user_id: string;
+  amount: number;
+  is_paid: boolean;
+  users: {
+    full_name: string | null;
+    email: string;
+  } | null;
+}
+
 export const ExpenseCard = ({ expense }: ExpenseCardProps) => {
+  const [splits, setSplits] = useState<ExpenseSplit[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchSplits = async () => {
+    if (!expense.is_shared) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('expense_splits')
+        .select(`
+          user_id,
+          amount,
+          is_paid,
+          users!inner(full_name, email)
+        `)
+        .eq('expense_id', expense.id);
+
+      if (error) throw error;
+      setSplits(data || []);
+    } catch (error) {
+      console.error('Error fetching splits:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSplits();
+  }, [expense.id, expense.is_shared]);
+
+  const totalPaid = splits.filter(s => s.is_paid).reduce((sum, s) => sum + s.amount, 0);
+  const totalUnpaid = splits.filter(s => !s.is_paid).reduce((sum, s) => sum + s.amount, 0);
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -59,6 +105,41 @@ export const ExpenseCard = ({ expense }: ExpenseCardProps) => {
                 </span>
               )}
             </div>
+
+            {expense.is_shared && splits.length > 0 && (
+              <div className="mt-3 pt-3 border-t">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="font-medium">Settlement Status:</span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 text-green-600">
+                      <Check className="h-3 w-3" />
+                      ${totalPaid.toFixed(2)} paid
+                    </div>
+                    {totalUnpaid > 0 && (
+                      <div className="flex items-center gap-1 text-amber-600">
+                        <AlertCircle className="h-3 w-3" />
+                        ${totalUnpaid.toFixed(2)} pending
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {splits.map((split) => (
+                    <div key={split.user_id} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span>{split.users?.full_name || split.users?.email}</span>
+                      <div className="flex items-center gap-1">
+                        <span>${split.amount.toFixed(2)}</span>
+                        {split.is_paid ? (
+                          <Check className="h-3 w-3 text-green-500" />
+                        ) : (
+                          <AlertCircle className="h-3 w-3 text-amber-500" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <div className="text-right">
             <p className="font-semibold text-lg">${expense.amount.toFixed(2)}</p>
