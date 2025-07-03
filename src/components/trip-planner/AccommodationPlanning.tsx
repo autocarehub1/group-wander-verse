@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Bed, MapPin, DollarSign, Users, Calendar, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Bed, MapPin, DollarSign, Users, Calendar, Trash2, ExternalLink, ChevronDown } from 'lucide-react';
 
 interface AccommodationOption {
   id: string;
@@ -32,10 +32,29 @@ interface AccommodationPlanningProps {
   tripId: string;
 }
 
+const popularDestinations = [
+  'Paris, France', 'London, UK', 'New York, USA', 'Tokyo, Japan', 'Barcelona, Spain',
+  'Rome, Italy', 'Amsterdam, Netherlands', 'Berlin, Germany', 'Madrid, Spain',
+  'Prague, Czech Republic', 'Vienna, Austria', 'Budapest, Hungary', 'Istanbul, Turkey',
+  'Bangkok, Thailand', 'Singapore', 'Sydney, Australia', 'Melbourne, Australia',
+  'Vancouver, Canada', 'Toronto, Canada', 'Los Angeles, USA', 'San Francisco, USA',
+  'Miami, USA', 'Las Vegas, USA', 'Chicago, USA', 'Boston, USA', 'Washington DC, USA',
+  'Dubai, UAE', 'Cairo, Egypt', 'Cape Town, South Africa', 'Mumbai, India',
+  'Delhi, India', 'Bangalore, India', 'Seoul, South Korea', 'Hong Kong',
+  'Kuala Lumpur, Malaysia', 'Jakarta, Indonesia', 'Manila, Philippines',
+  'Ho Chi Minh City, Vietnam', 'Hanoi, Vietnam', 'Phnom Penh, Cambodia',
+  'Yangon, Myanmar', 'Colombo, Sri Lanka', 'Kathmandu, Nepal', 'Dhaka, Bangladesh',
+  'Downtown', 'City Center', 'Old Town', 'Airport Area', 'Beach Front',
+  'Historic District', 'Business District', 'Shopping District', 'Waterfront'
+];
+
 export const AccommodationPlanning = ({ tripId }: AccommodationPlanningProps) => {
   const [accommodations, setAccommodations] = useState<AccommodationOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [filteredLocations, setFilteredLocations] = useState<string[]>([]);
+  const locationDropdownRef = useRef<HTMLDivElement>(null);
   const [newAccommodation, setNewAccommodation] = useState({
     name: '',
     type: 'hotel',
@@ -154,9 +173,41 @@ export const AccommodationPlanning = ({ tripId }: AccommodationPlanningProps) =>
     }
   };
 
+  const handleLocationChange = (value: string) => {
+    setNewAccommodation({ ...newAccommodation, location: value });
+    
+    if (value) {
+      const filtered = popularDestinations.filter(dest =>
+        dest.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 8);
+      setFilteredLocations(filtered);
+      setShowLocationDropdown(filtered.length > 0);
+    } else {
+      setFilteredLocations([]);
+      setShowLocationDropdown(false);
+    }
+  };
+
+  const selectLocation = (location: string) => {
+    setNewAccommodation({ ...newAccommodation, location });
+    setShowLocationDropdown(false);
+    setFilteredLocations([]);
+  };
+
   useEffect(() => {
     fetchAccommodations();
   }, [tripId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
+        setShowLocationDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (loading) {
     return <div className="text-center py-8">Loading accommodations...</div>;
@@ -211,12 +262,40 @@ export const AccommodationPlanning = ({ tripId }: AccommodationPlanningProps) =>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="accommodation-location">Location</Label>
-                  <Input
-                    id="accommodation-location"
-                    placeholder="e.g., Downtown Paris"
-                    value={newAccommodation.location}
-                    onChange={(e) => setNewAccommodation({ ...newAccommodation, location: e.target.value })}
-                  />
+                  <div className="relative" ref={locationDropdownRef}>
+                    <Input
+                      id="accommodation-location"
+                      placeholder="e.g., Downtown Paris"
+                      value={newAccommodation.location}
+                      onChange={(e) => handleLocationChange(e.target.value)}
+                      onFocus={() => {
+                        if (newAccommodation.location) {
+                          const filtered = popularDestinations.filter(dest =>
+                            dest.toLowerCase().includes(newAccommodation.location.toLowerCase())
+                          ).slice(0, 8);
+                          setFilteredLocations(filtered);
+                          setShowLocationDropdown(filtered.length > 0);
+                        }
+                      }}
+                    />
+                    {showLocationDropdown && filteredLocations.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        {filteredLocations.map((location, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-muted focus:bg-muted focus:outline-none transition-colors"
+                            onClick={() => selectLocation(location)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              {location}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
