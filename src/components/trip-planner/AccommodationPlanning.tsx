@@ -272,7 +272,7 @@ export const AccommodationPlanning = ({ tripId }: AccommodationPlanningProps) =>
     setNewAccommodation({ ...newAccommodation, location: value });
     
     if (value) {
-      const filtered = popularDestinations.filter(dest =>
+      const filtered = worldLocations.filter(dest =>
         dest.toLowerCase().includes(value.toLowerCase())
       ).slice(0, 8);
       setFilteredLocations(filtered);
@@ -365,7 +365,7 @@ export const AccommodationPlanning = ({ tripId }: AccommodationPlanningProps) =>
                       onChange={(e) => handleLocationChange(e.target.value)}
                       onFocus={() => {
                         if (newAccommodation.location) {
-                          const filtered = popularDestinations.filter(dest =>
+                          const filtered = worldLocations.filter(dest =>
                             dest.toLowerCase().includes(newAccommodation.location.toLowerCase())
                           ).slice(0, 8);
                           setFilteredLocations(filtered);
