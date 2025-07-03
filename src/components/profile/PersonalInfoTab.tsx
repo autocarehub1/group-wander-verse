@@ -1,0 +1,83 @@
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url?: string;
+  phone?: string;
+  bio?: string;
+  date_of_birth?: string;
+  travel_preferences?: Record<string, boolean>;
+  dietary_restrictions?: any;
+  accessibility_needs?: any;
+  notification_preferences?: Record<string, boolean>;
+  privacy_settings?: Record<string, boolean>;
+  emergency_contact?: Record<string, any>;
+}
+
+interface PersonalInfoTabProps {
+  profile: UserProfile;
+  setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
+  updateProfile: (updates: Partial<UserProfile>) => void;
+}
+
+export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
+  return (
+    <Card className="travel-card">
+      <CardHeader>
+        <CardTitle>Personal Information</CardTitle>
+        <CardDescription>
+          Update your personal details and profile information
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="full-name">Full Name</Label>
+            <Input
+              id="full-name"
+              value={profile.full_name || ''}
+              onChange={(e) => setProfile(prev => prev ? { ...prev, full_name: e.target.value } : null)}
+              onBlur={(e) => updateProfile({ full_name: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              value={profile.phone || ''}
+              onChange={(e) => setProfile(prev => prev ? { ...prev, phone: e.target.value } : null)}
+              onBlur={(e) => updateProfile({ phone: e.target.value })}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="bio">Bio</Label>
+          <Textarea
+            id="bio"
+            placeholder="Tell us about yourself and your travel interests..."
+            value={profile.bio || ''}
+            onChange={(e) => setProfile(prev => prev ? { ...prev, bio: e.target.value } : null)}
+            onBlur={(e) => updateProfile({ bio: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="dob">Date of Birth</Label>
+          <Input
+            id="dob"
+            type="date"
+            value={profile.date_of_birth || ''}
+            onChange={(e) => setProfile(prev => prev ? { ...prev, date_of_birth: e.target.value } : null)}
+            onBlur={(e) => updateProfile({ date_of_birth: e.target.value })}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
