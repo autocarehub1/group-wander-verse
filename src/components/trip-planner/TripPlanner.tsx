@@ -17,30 +17,36 @@ export const TripPlanner = ({ tripId, tripTitle, tripDestination }: TripPlannerP
   return (
     <div className="w-full">
       <Tabs defaultValue="itinerary" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="itinerary">
-            <Calendar className="h-4 w-4 mr-2" />
-            Itinerary
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 gap-1">
+          <TabsTrigger value="itinerary" className="text-xs md:text-sm">
+            <Calendar className="h-4 w-4 md:mr-2" />
+            <span className="hidden sm:inline">Itinerary</span>
+            <span className="sm:hidden">Plan</span>
           </TabsTrigger>
-          <TabsTrigger value="activities">
-            <MapPin className="h-4 w-4 mr-2" />
-            Activities
+          <TabsTrigger value="activities" className="text-xs md:text-sm">
+            <MapPin className="h-4 w-4 md:mr-2" />
+            <span className="hidden sm:inline">Activities</span>
+            <span className="sm:hidden">Do</span>
           </TabsTrigger>
-          <TabsTrigger value="accommodation">
-            <Bed className="h-4 w-4 mr-2" />
-            Hotels
+          <TabsTrigger value="accommodation" className="text-xs md:text-sm">
+            <Bed className="h-4 w-4 md:mr-2" />
+            <span className="hidden sm:inline">Hotels</span>
+            <span className="sm:hidden">Stay</span>
           </TabsTrigger>
-          <TabsTrigger value="expenses">
-            <DollarSign className="h-4 w-4 mr-2" />
-            Expenses
+          <TabsTrigger value="expenses" className="text-xs md:text-sm">
+            <DollarSign className="h-4 w-4 md:mr-2" />
+            <span className="hidden sm:inline">Expenses</span>
+            <span className="sm:hidden">Cost</span>
           </TabsTrigger>
-          <TabsTrigger value="payments">
-            <CreditCard className="h-4 w-4 mr-2" />
-            Payments
+          <TabsTrigger value="payments" className="text-xs md:text-sm">
+            <CreditCard className="h-4 w-4 md:mr-2" />
+            <span className="hidden sm:inline">Payments</span>
+            <span className="sm:hidden">Pay</span>
           </TabsTrigger>
-          <TabsTrigger value="documents">
-            <FileText className="h-4 w-4 mr-2" />
-            Documents
+          <TabsTrigger value="documents" className="text-xs md:text-sm">
+            <FileText className="h-4 w-4 md:mr-2" />
+            <span className="hidden sm:inline">Documents</span>
+            <span className="sm:hidden">Docs</span>
           </TabsTrigger>
         </TabsList>
         

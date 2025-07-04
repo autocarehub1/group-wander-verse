@@ -41,20 +41,24 @@ export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupMan
       
       <CardContent>
         <Tabs defaultValue="chat" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="chat">
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Group Chat
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
+            <TabsTrigger value="chat" className="text-xs md:text-sm">
+              <MessageCircle className="h-4 w-4 md:mr-2" />
+              <span className="hidden sm:inline">Group Chat</span>
+              <span className="sm:hidden">Chat</span>
             </TabsTrigger>
-            <TabsTrigger value="planner">
-              <MapPin className="h-4 w-4 mr-2" />
-              Trip Planner
+            <TabsTrigger value="planner" className="text-xs md:text-sm">
+              <MapPin className="h-4 w-4 md:mr-2" />
+              <span className="hidden sm:inline">Trip Planner</span>
+              <span className="sm:hidden">Planner</span>
             </TabsTrigger>
-            <TabsTrigger value="participants">
-              Participants ({participants.length})
+            <TabsTrigger value="participants" className="text-xs md:text-sm">
+              <span className="hidden sm:inline">Participants ({participants.length})</span>
+              <span className="sm:hidden">People ({participants.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="invitations">
-              Invitations ({invitations.filter(i => i.status === 'pending').length})
+            <TabsTrigger value="invitations" className="text-xs md:text-sm">
+              <span className="hidden sm:inline">Invitations ({invitations.filter(i => i.status === 'pending').length})</span>
+              <span className="sm:hidden">Invites ({invitations.filter(i => i.status === 'pending').length})</span>
             </TabsTrigger>
           </TabsList>
           
