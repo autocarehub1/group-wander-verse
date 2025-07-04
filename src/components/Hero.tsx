@@ -36,23 +36,32 @@ const Hero = () => {
           </div>
 
           {/* Feature highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-            <div className="travel-card bg-white/10 backdrop-blur-sm p-6 text-center group hover:bg-white/15 transition-all duration-300">
-              <Users className="mx-auto mb-4 text-primary-glow" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Group Planning</h3>
-              <p className="text-white/80">Collaborate with friends to plan the perfect trip together</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+            <div className="feature-card p-8 text-center group">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
+                <Users className="relative mx-auto text-primary-glow" size={48} />
+              </div>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-primary-glow transition-colors">Group Planning</h3>
+              <p className="text-white/90 leading-relaxed">Collaborate with friends to plan the perfect trip together with seamless coordination</p>
             </div>
             
-            <div className="travel-card bg-white/10 backdrop-blur-sm p-6 text-center group hover:bg-white/15 transition-all duration-300">
-              <MapPin className="mx-auto mb-4 text-accent" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Smart Itineraries</h3>
-              <p className="text-white/80">AI-powered suggestions for destinations and activities</p>
+            <div className="feature-card p-8 text-center group">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl"></div>
+                <MapPin className="relative mx-auto text-accent" size={48} />
+              </div>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-accent transition-colors">Smart Itineraries</h3>
+              <p className="text-white/90 leading-relaxed">AI-powered suggestions for destinations and activities tailored to your group</p>
             </div>
             
-            <div className="travel-card bg-white/10 backdrop-blur-sm p-6 text-center group hover:bg-white/15 transition-all duration-300">
-              <Calendar className="mx-auto mb-4 text-nature" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Real-time Sync</h3>
-              <p className="text-white/80">Stay coordinated with live updates and notifications</p>
+            <div className="feature-card p-8 text-center group">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-nature/20 rounded-full blur-xl"></div>
+                <Calendar className="relative mx-auto text-nature" size={48} />
+              </div>
+              <h3 className="text-xl font-bold mb-3 group-hover:text-nature transition-colors">Real-time Sync</h3>
+              <p className="text-white/90 leading-relaxed">Stay coordinated with live updates and instant notifications</p>
             </div>
           </div>
         </div>
