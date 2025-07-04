@@ -282,6 +282,32 @@ export const useInvitations = (tripId?: string) => {
     }
   };
 
+  const cleanupDeclinedInvitations = async () => {
+    if (!user || !tripId) return;
+
+    try {
+      // Call the database function to clean up declined invitations
+      const { error } = await supabase
+        .rpc('cleanup_declined_invitations');
+
+      if (error) throw error;
+
+      // Refresh the invitations list
+      await fetchInvitations();
+      
+      toast({
+        title: "Cleanup completed",
+        description: "Declined and expired invitations have been removed."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error cleaning up invitations",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   useEffect(() => {
     if (tripId) {
       fetchInvitations();
@@ -295,6 +321,7 @@ export const useInvitations = (tripId?: string) => {
     acceptInvitation,
     declineInvitation,
     generateShareableLink,
+    cleanupDeclinedInvitations,
     refetchInvitations: fetchInvitations
   };
 };

@@ -1074,6 +1074,10 @@ export type Database = {
         Args: { trip_uuid: string; user_uuid: string }
         Returns: boolean
       }
+      cleanup_declined_invitations: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       is_trip_participant: {
         Args: { trip_uuid: string }
         Returns: boolean
