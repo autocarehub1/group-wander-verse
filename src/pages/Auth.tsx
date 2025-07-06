@@ -69,7 +69,7 @@ const Auth = () => {
           <span className="text-xl sm:text-2xl font-bold gradient-text">WanderTogether</span>
         </div>
 
-        <Card className="travel-card">
+        <Card className="bg-card border border-border rounded-xl shadow-card">
           <CardHeader className="text-center px-4 sm:px-6 pt-6 pb-4">
             <CardTitle className="text-xl sm:text-2xl">Welcome Back</CardTitle>
             <CardDescription className="text-sm sm:text-base mt-2">
@@ -114,7 +114,7 @@ const Auth = () => {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent z-10"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent z-[1]"
                         onClick={() => setShowPassword(prev => ({ ...prev, signIn: !prev.signIn }))}
                         tabIndex={-1}
                       >
@@ -177,7 +177,7 @@ const Auth = () => {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent z-10"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent z-[1]"
                         onClick={() => setShowPassword(prev => ({ ...prev, signUp: !prev.signUp }))}
                         tabIndex={-1}
                       >
