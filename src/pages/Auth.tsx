@@ -78,9 +78,19 @@ const Auth = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-6">
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 h-10 sm:h-11 relative z-10">
-                <TabsTrigger value="signin" className="text-sm sm:text-base relative z-10 cursor-pointer">Sign In</TabsTrigger>
-                <TabsTrigger value="signup" className="text-sm sm:text-base relative z-10 cursor-pointer">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 h-10 sm:h-11 bg-muted">
+                <TabsTrigger 
+                  value="signin" 
+                  className="text-sm sm:text-base data-[state=active]:bg-background data-[state=active]:text-foreground cursor-pointer pointer-events-auto"
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="signup" 
+                  className="text-sm sm:text-base data-[state=active]:bg-background data-[state=active]:text-foreground cursor-pointer pointer-events-auto"
+                >
+                  Sign Up
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="signin" className="mt-4 sm:mt-6">
