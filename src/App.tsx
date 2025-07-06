@@ -12,6 +12,7 @@ import JoinTrip from "./pages/JoinTrip";
 import NotFound from "./pages/NotFound";
 import ExpenseTracking from "./pages/ExpenseTracking";
 import ExpensePayments from "./pages/ExpensePayments";
+import GroupChatPage from "./pages/GroupChatPage";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,11 @@ const App = () => (
             <Route path="/expense-payments" element={
               <ProtectedRoute>
                 <ExpensePayments />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <GroupChatPage />
               </ProtectedRoute>
             } />
             <Route path="/join/:token" element={<JoinTrip />} />

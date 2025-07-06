@@ -68,7 +68,7 @@ const Index = () => {
             {[
               { icon: CreditCard, title: "Expense Payments", desc: "Settle outstanding balances and track payments", link: "/expense-payments", variant: "outline" as const },
               { icon: Users, title: "Group Management", desc: "Invite friends and manage trip participants", link: "/trips", variant: "outline" as const },
-              { icon: MessageCircle, title: "Group Chat", desc: "Chat with your travel groups and share updates", link: "/trips", variant: "outline" as const },
+              { icon: MessageCircle, title: "Group Chat", desc: "Chat with your travel groups and share updates", link: "/chat", variant: "outline" as const },
               { icon: Calendar, title: "Trip Planning", desc: "Plan activities, accommodations, and itineraries", link: "/trips", variant: "outline" as const },
               { icon: DollarSign, title: "Expense Tracking", desc: "Track shared expenses and split costs with your group", link: "/expense-tracking", variant: "outline" as const }
             ].map((item, index) => (
