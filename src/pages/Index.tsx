@@ -44,26 +44,26 @@ const Index = () => {
           </div>
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            <Card className="travel-card group cursor-pointer border-0 bg-white/90 backdrop-blur-md hover:bg-white/95">
-              <CardHeader className="pb-4">
-                <div className="relative mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-hero rounded-2xl opacity-20"></div>
-                  <div className="absolute inset-0 bg-white/50 rounded-2xl"></div>
-                  <MapPin className="relative z-10 h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="text-center group-hover:text-primary transition-colors">
-                  My Trips
-                </CardTitle>
-                <CardDescription className="text-center">
-                  Manage your trips, chat with groups, and plan itineraries
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/trips">
-                  <Button className="w-full" variant="hero">View All Trips</Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <Link to="/trips" className="block">
+              <Card className="travel-card group cursor-pointer border-0 bg-white/90 backdrop-blur-md hover:bg-white/95 h-full">
+                <CardHeader className="pb-4">
+                  <div className="relative mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-hero rounded-2xl opacity-20"></div>
+                    <div className="absolute inset-0 bg-white/50 rounded-2xl"></div>
+                    <MapPin className="relative z-10 h-8 w-8 text-primary" />
+                  </div>
+                  <CardTitle className="text-center group-hover:text-primary transition-colors">
+                    My Trips
+                  </CardTitle>
+                  <CardDescription className="text-center">
+                    Manage your trips, chat with groups, and plan itineraries
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full pointer-events-none" variant="hero">View All Trips</Button>
+                </CardContent>
+              </Card>
+            </Link>
 
             {[
               { icon: CreditCard, title: "Expense Payments", desc: "Settle outstanding balances and track payments", link: "/expense-payments", variant: "outline" as const },
@@ -72,26 +72,32 @@ const Index = () => {
               { icon: Calendar, title: "Trip Planning", desc: "Plan activities, accommodations, and itineraries", link: "/trips", variant: "outline" as const },
               { icon: DollarSign, title: "Expense Tracking", desc: "Track shared expenses and split costs with your group", link: "/expense-tracking", variant: "outline" as const }
             ].map((item, index) => (
-              <Card key={index} className="travel-card group cursor-pointer border-0 bg-white/90 backdrop-blur-md hover:bg-white/95">
-                <CardHeader className="pb-4">
-                  <div className="relative mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-hero rounded-2xl opacity-20"></div>
-                    <div className="absolute inset-0 bg-white/50 rounded-2xl"></div>
-                    <item.icon className="relative z-10 h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle className="text-center group-hover:text-primary transition-colors">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className="text-center">
-                    {item.desc}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to={item.link}>
-                    <Button variant={item.variant} className="w-full">{item.title.split(' ')[0]} {item.title.split(' ')[1] || ''}</Button>
-                  </Link>
-                </CardContent>
-              </Card>
+              <Link key={index} to={item.link} className="block">
+                <Card className="travel-card group cursor-pointer border-0 bg-white/90 backdrop-blur-md hover:bg-white/95 h-full">
+                  <CardHeader className="pb-4">
+                    <div className="relative mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                      <div className="absolute inset-0 bg-gradient-hero rounded-2xl opacity-20"></div>
+                      <div className="absolute inset-0 bg-white/50 rounded-2xl"></div>
+                      <item.icon className="relative z-10 h-8 w-8 text-primary" />
+                    </div>
+                    <CardTitle className="text-center group-hover:text-primary transition-colors">
+                      {item.title}
+                    </CardTitle>
+                    <CardDescription className="text-center">
+                      {item.desc}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant={item.variant} className="w-full pointer-events-none">
+                      {item.title === "Expense Payments" ? "Expense Payments" : 
+                       item.title === "Group Management" ? "Group Management" :
+                       item.title === "Group Chat" ? "Group Chat" :
+                       item.title === "Trip Planning" ? "Trip Planning" :
+                       "Expense Tracking"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
           
