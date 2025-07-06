@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { useTrips } from '@/hooks/useTrips';
 import { GroupManagement } from '@/components/GroupManagement';
-import { MapPin, Plus, Calendar, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MapPin, Plus, Calendar, Users, ArrowLeft } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Trips = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -94,6 +94,15 @@ const Trips = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Link to="/">
+          <Button variant="outline" className="mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
+      
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">My Trips</h1>
