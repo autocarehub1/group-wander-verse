@@ -10,10 +10,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [signInData, setSignInData] = useState({ email: '', password: '' });
+  const [signUpData, setSignUpData] = useState({ email: '', password: '', fullName: '' });
+  const [showPassword, setShowPassword] = useState({ signIn: false, signUp: false });
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
@@ -26,7 +25,7 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signUp(email, password, { full_name: fullName });
+    const { error } = await signUp(signUpData.email, signUpData.password, { full_name: signUpData.fullName });
 
     if (error) {
       toast({
@@ -47,7 +46,7 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(signInData.email, signInData.password);
 
     if (error) {
       toast({
@@ -60,8 +59,8 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-sky flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-sky flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-md mx-auto">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
           <div className="w-12 h-12 bg-gradient-hero rounded-lg flex items-center justify-center mr-3">
@@ -92,9 +91,10 @@ const Auth = () => {
                       id="signin-email"
                       type="email"
                       placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={signInData.email}
+                      onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
                       required
+                      autoComplete="email"
                     />
                   </div>
                   <div className="space-y-2">
@@ -102,20 +102,23 @@ const Auth = () => {
                     <div className="relative">
                       <Input
                         id="signin-password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword.signIn ? "text" : "password"}
                         placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={signInData.password}
+                        onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
                         required
+                        autoComplete="current-password"
+                        className="pr-10"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent z-10"
+                        onClick={() => setShowPassword(prev => ({ ...prev, signIn: !prev.signIn }))}
+                        tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword.signIn ? <EyeOff size={16} /> : <Eye size={16} />}
                       </Button>
                     </div>
                   </div>
@@ -138,9 +141,10 @@ const Auth = () => {
                       id="signup-name"
                       type="text"
                       placeholder="Enter your full name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      value={signUpData.fullName}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, fullName: e.target.value }))}
                       required
+                      autoComplete="name"
                     />
                   </div>
                   <div className="space-y-2">
@@ -149,9 +153,10 @@ const Auth = () => {
                       id="signup-email"
                       type="email"
                       placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={signUpData.email}
+                      onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
                       required
+                      autoComplete="email"
                     />
                   </div>
                   <div className="space-y-2">
@@ -159,21 +164,24 @@ const Auth = () => {
                     <div className="relative">
                       <Input
                         id="signup-password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword.signUp ? "text" : "password"}
                         placeholder="Create a password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={signUpData.password}
+                        onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
                         required
                         minLength={6}
+                        autoComplete="new-password"
+                        className="pr-10"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent z-10"
+                        onClick={() => setShowPassword(prev => ({ ...prev, signUp: !prev.signUp }))}
+                        tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword.signUp ? <EyeOff size={16} /> : <Eye size={16} />}
                       </Button>
                     </div>
                   </div>
