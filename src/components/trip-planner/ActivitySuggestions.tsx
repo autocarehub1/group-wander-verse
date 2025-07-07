@@ -24,6 +24,9 @@ interface ActivitySuggestion {
   updated_at?: string | null;
   external_data?: any;
   external_id?: string | null;
+  upvotes?: number;
+  downvotes?: number;
+  user_vote?: 'upvote' | 'downvote' | null;
 }
 
 interface ActivitySuggestionsProps {
@@ -47,14 +50,43 @@ export const ActivitySuggestions = ({ tripId }: ActivitySuggestionsProps) => {
   const fetchActivities = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const currentUser = await supabase.auth.getUser();
+      
+      // Get activities with vote counts and user's vote
+      const { data: activitiesData, error } = await supabase
         .from('activity_suggestions')
-        .select('*')
+        .select(`
+          *,
+          activity_votes (
+            vote_type,
+            user_id
+          )
+        `)
         .eq('trip_id', tripId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setActivities(data || []);
+
+      // Process the data to include vote counts and user's vote
+      const processedActivities = (activitiesData || []).map(activity => {
+        const votes = activity.activity_votes || [];
+        const upvotes = votes.filter(vote => vote.vote_type === 'upvote').length;
+        const downvotes = votes.filter(vote => vote.vote_type === 'downvote').length;
+        const userVoteType = votes.find(vote => vote.user_id === currentUser.data.user?.id)?.vote_type;
+        const userVote = (userVoteType === 'upvote' || userVoteType === 'downvote') ? userVoteType : null;
+
+        // Remove the activity_votes property and add our computed properties
+        const { activity_votes, ...activityWithoutVotes } = activity;
+        
+        return {
+          ...activityWithoutVotes,
+          upvotes,
+          downvotes,
+          user_vote: userVote as 'upvote' | 'downvote' | null
+        } as ActivitySuggestion;
+      });
+
+      setActivities(processedActivities);
     } catch (error: any) {
       toast({
         title: "Error loading activities",
@@ -174,6 +206,9 @@ export const ActivitySuggestions = ({ tripId }: ActivitySuggestionsProps) => {
         title: "Vote recorded",
         description: `Your ${voteType} has been recorded.`
       });
+      
+      // Refresh activities to show updated vote counts
+      await fetchActivities();
     } catch (error: any) {
       toast({
         title: "Error voting",
@@ -340,18 +375,22 @@ export const ActivitySuggestions = ({ tripId }: ActivitySuggestionsProps) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      variant="outline"
+                      variant={activity.user_vote === 'upvote' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => voteOnActivity(activity.id, 'upvote')}
+                      className="flex items-center gap-1"
                     >
                       <ThumbsUp className="h-4 w-4" />
+                      {activity.upvotes || 0}
                     </Button>
                     <Button
-                      variant="outline"
+                      variant={activity.user_vote === 'downvote' ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => voteOnActivity(activity.id, 'downvote')}
+                      className="flex items-center gap-1"
                     >
                       <ThumbsDown className="h-4 w-4" />
+                      {activity.downvotes || 0}
                     </Button>
                   </div>
                 </div>
