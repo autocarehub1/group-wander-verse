@@ -16,3 +16,6 @@ verify_jwt = true
 
 [functions.verify-expense-payment]
 verify_jwt = true
+
+[functions.generate-location-suggestions]
+verify_jwt = true

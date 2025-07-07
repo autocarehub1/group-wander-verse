@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import { useTrips } from '@/hooks/useTrips';
+import { useLocationSuggestions } from '@/hooks/useLocationSuggestions';
 
 interface CreateTripDialogProps {
   onTripCreated?: () => void;
@@ -13,6 +15,7 @@ interface CreateTripDialogProps {
 
 export const CreateTripDialog = ({ onTripCreated }: CreateTripDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [generateAISuggestions, setGenerateAISuggestions] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     destination: '',
@@ -22,6 +25,7 @@ export const CreateTripDialog = ({ onTripCreated }: CreateTripDialogProps) => {
   });
 
   const { createTrip } = useTrips();
+  const { generateSuggestions, loading: suggestionsLoading } = useLocationSuggestions();
 
   const handleCreateTrip = async () => {
     if (!formData.title.trim() || !formData.destination.trim()) {
@@ -37,6 +41,11 @@ export const CreateTripDialog = ({ onTripCreated }: CreateTripDialogProps) => {
     });
 
     if (result) {
+      // Generate AI suggestions if enabled
+      if (generateAISuggestions && result.id) {
+        await generateSuggestions(formData.destination, result.id);
+      }
+
       setFormData({
         title: '',
         destination: '',
@@ -44,6 +53,7 @@ export const CreateTripDialog = ({ onTripCreated }: CreateTripDialogProps) => {
         start_date: '',
         end_date: ''
       });
+      setGenerateAISuggestions(true);
       setIsOpen(false);
       onTripCreated?.();
     }
@@ -123,12 +133,27 @@ export const CreateTripDialog = ({ onTripCreated }: CreateTripDialogProps) => {
             </div>
           </div>
           
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="ai-suggestions"
+              checked={generateAISuggestions}
+              onCheckedChange={(checked) => setGenerateAISuggestions(checked === true)}
+            />
+            <Label 
+              htmlFor="ai-suggestions" 
+              className="text-sm font-normal flex items-center gap-1 cursor-pointer"
+            >
+              <Sparkles className="h-3 w-3" />
+              Generate AI suggestions for activities and hotels
+            </Label>
+          </div>
+          
           <Button 
             onClick={handleCreateTrip} 
             className="w-full"
-            disabled={!formData.title.trim() || !formData.destination.trim()}
+            disabled={!formData.title.trim() || !formData.destination.trim() || suggestionsLoading}
           >
-            Create Trip
+            {suggestionsLoading ? 'Creating Trip & Generating Suggestions...' : 'Create Trip'}
           </Button>
         </div>
       </DialogContent>

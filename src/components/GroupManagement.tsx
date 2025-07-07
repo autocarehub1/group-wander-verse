@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { useParticipants } from '@/hooks/useParticipants';
 import { useInvitations } from '@/hooks/useInvitations';
+import { useLocationSuggestions } from '@/hooks/useLocationSuggestions';
 import { GroupChat } from './GroupChat';
 import { TripPlanner } from './trip-planner/TripPlanner';
 import { InvitationDialog } from './group-management/InvitationDialog';
 import { ParticipantsTab } from './group-management/ParticipantsTab';
 import { InvitationsTab } from './group-management/InvitationsTab';
-import { Users, MessageCircle, MapPin } from 'lucide-react';
+import { Users, MessageCircle, MapPin, Sparkles } from 'lucide-react';
 
 interface GroupManagementProps {
   tripId: string;
@@ -18,8 +20,13 @@ interface GroupManagementProps {
 export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupManagementProps) => {
   const { participants, canManageParticipants } = useParticipants(tripId);
   const { invitations } = useInvitations(tripId);
+  const { generateSuggestions, loading } = useLocationSuggestions();
 
   const isOwnerOrCoOrganizer = canManageParticipants();
+
+  const handleGenerateSuggestions = async () => {
+    await generateSuggestions(tripDestination, tripId);
+  };
 
   return (
     <Card className="w-full">
@@ -35,7 +42,19 @@ export const GroupManagement = ({ tripId, tripTitle, tripDestination }: GroupMan
             </CardDescription>
           </div>
           
-          <InvitationDialog tripId={tripId} isOwnerOrCoOrganizer={isOwnerOrCoOrganizer} />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGenerateSuggestions}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              {loading ? 'Generating...' : 'AI Suggestions'}
+            </Button>
+            <InvitationDialog tripId={tripId} isOwnerOrCoOrganizer={isOwnerOrCoOrganizer} />
+          </div>
         </div>
       </CardHeader>
       
