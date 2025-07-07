@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, MapPin, Calendar } from "lucide-react";
 import heroImage from "@/assets/hero-travel.jpg";
+import wanderTogetherLogo from "@/assets/wandertogether-logo.png";
 
 const Hero = () => {
   return (
@@ -16,6 +17,13 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center text-white">
         <div className="max-w-4xl mx-auto animate-fade-in">
+          <div className="flex justify-center mb-8">
+            <img 
+              src={wanderTogetherLogo} 
+              alt="WanderTogether Logo" 
+              className="w-24 h-24 md:w-32 md:h-32 object-contain animate-float"
+            />
+          </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             <span className="block mb-2">Wander</span>
             <span className="gradient-text">Together</span>

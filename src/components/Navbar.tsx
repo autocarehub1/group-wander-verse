@@ -11,6 +11,7 @@ import {
 import { Menu, X, MapPin, User, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
+import wanderTogetherLogo from "@/assets/wandertogether-logo.png";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,9 +29,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-hero rounded-lg flex items-center justify-center">
-              <MapPin className="text-white" size={20} />
-            </div>
+            <img 
+              src={wanderTogetherLogo} 
+              alt="WanderTogether Logo" 
+              className="w-10 h-10 rounded-lg object-contain"
+            />
             <span className="text-xl font-bold gradient-text">WanderTogether</span>
           </Link>
 
