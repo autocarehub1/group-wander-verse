@@ -35,8 +35,8 @@ const Auth = () => {
       });
     } else {
       toast({
-        title: "Check your email",
-        description: "Please check your email for a confirmation link to complete your registration."
+        title: "Welcome to WanderTogether! 🎉",
+        description: "Account created successfully! Check your email for a welcome message and confirmation link."
       });
     }
     setLoading(false);
