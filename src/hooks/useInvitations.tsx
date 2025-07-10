@@ -110,9 +110,10 @@ export const useInvitations = (tripId?: string) => {
               invitationToken: invitation.invitation_token
             });
 
-            const emailResponse = await supabase.functions.invoke('send-email', {
+            const emailResponse = await supabase.functions.invoke('send-invitation-email', {
               body: {
-                to: inviteData.invite_value,
+                invitationId: invitation.id,
+                inviteEmail: inviteData.invite_value,
                 tripTitle: trip.title,
                 tripDestination: trip.destination,
                 inviterName: userProfile.full_name || userProfile.email,
@@ -129,31 +130,19 @@ export const useInvitations = (tripId?: string) => {
                 description: "The invitation was created but we couldn't send the email. Please share the invitation link manually.",
                 variant: "destructive"
               });
-            } else if (emailResponse.data) {
-              const responseData = emailResponse.data;
-              
-              if (responseData.method === "EmailJS") {
-                console.log('Email sent successfully via EmailJS');
-                toast({
-                  title: "Email sent successfully",
-                  description: `Invitation email has been sent to ${inviteData.invite_value}.`
-                });
-              } else if (responseData.method === "mailto_fallback") {
-                console.log('Using mailto fallback');
-                toast({
-                  title: "Invitation created",
-                  description: `Invitation link: ${responseData.invitationLink}`,
-                });
-                
-                // Copy the invitation link to clipboard
-                if (navigator.clipboard) {
-                  navigator.clipboard.writeText(responseData.invitationLink);
-                  toast({
-                    title: "Link copied to clipboard",
-                    description: "Share this link with the person you want to invite."
-                  });
-                }
-              }
+            } else if (emailResponse.data && emailResponse.data.success) {
+              console.log('Email sent successfully via Resend');
+              toast({
+                title: "Email sent successfully",
+                description: `Invitation email has been sent to ${inviteData.invite_value}.`
+              });
+            } else {
+              console.error('Unexpected email response:', emailResponse.data);
+              toast({
+                title: "Invitation created but email uncertain",
+                description: "The invitation was created. Please check if the email was delivered.",
+                variant: "destructive"
+              });
             }
           } else {
             console.error('Missing trip or user profile data');

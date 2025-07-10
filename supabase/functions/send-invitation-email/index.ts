@@ -36,7 +36,7 @@ serve(async (req: Request): Promise<Response> => {
     const joinUrl = `https://d0253439-cb12-43b0-aff1-fddf3f910d61.lovableproject.com/join/${invitationToken}`;
 
     const emailResponse = await resend.emails.send({
-      from: "TripPlanner <onboarding@resend.dev>",
+      from: "WanderTogether <onboarding@resend.dev>",
       to: [inviteEmail],
       subject: `${inviterName} invited you to join "${tripTitle}"`,
       html: `
