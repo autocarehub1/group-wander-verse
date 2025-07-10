@@ -108,13 +108,6 @@ export const useInvitations = (tripId?: string) => {
             console.log('✅ Trip and user data loaded successfully');
             console.log('🏖️ Trip details:', { title: trip.title, destination: trip.destination });
             console.log('👤 User profile:', { name: userProfile.full_name, email: userProfile.email });
-            console.log('Calling email function with data:', {
-              to: inviteData.invite_value,
-              tripTitle: trip.title,
-              tripDestination: trip.destination,
-              inviterName: userProfile.full_name || userProfile.email,
-              invitationToken: invitation.invitation_token
-            });
 
             console.log('📤 Calling send-invitation-email function...');
             const emailResponse = await supabase.functions.invoke('send-invitation-email', {
@@ -131,20 +124,20 @@ export const useInvitations = (tripId?: string) => {
             console.log('📨 Email function raw response:', emailResponse);
 
             if (emailResponse.error) {
-              console.error('Error sending email:', emailResponse.error);
+              console.error('❌ Error sending email:', emailResponse.error);
               toast({
                 title: "Invitation created but email failed",
-                description: "The invitation was created but we couldn't send the email. Please share the invitation link manually.",
+                description: `Email error: ${emailResponse.error.message}. Please share the invitation link manually.`,
                 variant: "destructive"
               });
             } else if (emailResponse.data && emailResponse.data.success) {
-              console.log('Email sent successfully via Resend');
+              console.log('✅ Email sent successfully via Resend');
               toast({
                 title: "Email sent successfully",
                 description: `Invitation email has been sent to ${inviteData.invite_value}.`
               });
             } else {
-              console.error('Unexpected email response:', emailResponse.data);
+              console.error('⚠️ Unexpected email response:', emailResponse.data);
               toast({
                 title: "Invitation created but email uncertain",
                 description: "The invitation was created. Please check if the email was delivered.",

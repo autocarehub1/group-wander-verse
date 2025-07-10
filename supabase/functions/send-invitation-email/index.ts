@@ -33,7 +33,7 @@ serve(async (req: Request): Promise<Response> => {
     
     console.log('Sending invitation email:', { invitationId, inviteEmail, tripTitle });
 
-    const joinUrl = `https://d0253439-cb12-43b0-aff1-fddf3f910d61.lovableproject.com/join/${invitationToken}`;
+    const joinUrl = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/join/${invitationToken}`;
 
     const emailResponse = await resend.emails.send({
       from: "WanderTogether <onboarding@resend.dev>",
