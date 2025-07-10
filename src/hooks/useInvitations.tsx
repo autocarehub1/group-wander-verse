@@ -81,6 +81,9 @@ export const useInvitations = (tripId?: string) => {
 
       // Send email invitation if it's an email type
       if (inviteData.invite_type === 'email' && inviteData.invite_value && invitation.invitation_token) {
+        console.log('🚀 Starting email invitation process...');
+        console.log('📧 Email recipient:', inviteData.invite_value);
+        console.log('🎫 Invitation token:', invitation.invitation_token);
         try {
           console.log('Attempting to send email invitation...');
           
@@ -102,6 +105,9 @@ export const useInvitations = (tripId?: string) => {
           console.log('Trip details:', trip);
 
           if (trip && userProfile) {
+            console.log('✅ Trip and user data loaded successfully');
+            console.log('🏖️ Trip details:', { title: trip.title, destination: trip.destination });
+            console.log('👤 User profile:', { name: userProfile.full_name, email: userProfile.email });
             console.log('Calling email function with data:', {
               to: inviteData.invite_value,
               tripTitle: trip.title,
@@ -110,6 +116,7 @@ export const useInvitations = (tripId?: string) => {
               invitationToken: invitation.invitation_token
             });
 
+            console.log('📤 Calling send-invitation-email function...');
             const emailResponse = await supabase.functions.invoke('send-invitation-email', {
               body: {
                 invitationId: invitation.id,
@@ -121,7 +128,7 @@ export const useInvitations = (tripId?: string) => {
               }
             });
 
-            console.log('Email function response:', emailResponse);
+            console.log('📨 Email function raw response:', emailResponse);
 
             if (emailResponse.error) {
               console.error('Error sending email:', emailResponse.error);
