@@ -50,6 +50,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         data: userData
       }
     });
+
+    // Send confirmation email if signup was successful
+    if (!error) {
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
+          body: {
+            email,
+            name: userData?.full_name || userData?.name,
+          }
+        });
+        
+        if (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+        } else {
+          console.log('Confirmation email sent successfully');
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+      }
+    }
+
     return { error };
   };
 

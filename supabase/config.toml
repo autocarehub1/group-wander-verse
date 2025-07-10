@@ -19,3 +19,6 @@ verify_jwt = true
 
 [functions.generate-location-suggestions]
 verify_jwt = true
+
+[functions.send-confirmation-email]
+verify_jwt = false
