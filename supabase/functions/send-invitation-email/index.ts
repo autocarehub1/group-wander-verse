@@ -5,8 +5,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface InvitationEmailRequest {
@@ -18,20 +17,16 @@ interface InvitationEmailRequest {
   invitationToken: string;
 }
 
-serve(async (req: Request): Promise<Response> => {
-  console.log('Edge function called with method:', req.method);
-  
+const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    console.log('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Processing invitation email request...');
     const { invitationId, inviteEmail, tripTitle, tripDestination, inviterName, invitationToken }: InvitationEmailRequest = await req.json();
     
-    console.log('Sending invitation email:', { invitationId, inviteEmail, tripTitle });
+    console.log("Sending invitation email to:", inviteEmail);
 
     const joinUrl = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/join/${invitationToken}`;
 
@@ -40,61 +35,86 @@ serve(async (req: Request): Promise<Response> => {
       to: [inviteEmail],
       subject: `${inviterName} invited you to join "${tripTitle}"`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #333; text-align: center;">You're Invited!</h1>
-          
-          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="color: #2563eb; margin-top: 0;">${tripTitle}</h2>
-            <p style="color: #666; font-size: 16px; margin: 10px 0;">
-              <strong>Destination:</strong> ${tripDestination}
-            </p>
-            <p style="color: #666; font-size: 16px; margin: 10px 0;">
-              <strong>Invited by:</strong> ${inviterName}
-            </p>
-          </div>
-
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${joinUrl}" 
-               style="background-color: #2563eb; color: white; padding: 12px 24px; 
-                      text-decoration: none; border-radius: 6px; font-weight: bold;
-                      display: inline-block;">
-              Join Trip
-            </a>
-          </div>
-
-          <p style="color: #666; font-size: 14px; text-align: center;">
-            If the button doesn't work, copy and paste this link into your browser:
-          </p>
-          <p style="color: #2563eb; font-size: 14px; text-align: center; word-break: break-all;">
-            ${joinUrl}
-          </p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          
-          <p style="color: #999; font-size: 12px; text-align: center;">
-            This invitation was sent by ${inviterName}. If you didn't expect this invitation, you can safely ignore this email.
-          </p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>You're Invited to ${tripTitle}</title>
+          </head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #3b82f6; margin-bottom: 10px;">You're Invited! 🎉</h1>
+              <p style="color: #6b7280; font-size: 18px;">Join an amazing trip adventure</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+              <h2 style="color: white; margin-bottom: 20px;">${tripTitle}</h2>
+              <p style="color: white; font-size: 16px; margin-bottom: 15px;">
+                <strong>📍 Destination:</strong> ${tripDestination}
+              </p>
+              <p style="color: white; font-size: 16px; margin-bottom: 25px;">
+                <strong>👤 Invited by:</strong> ${inviterName}
+              </p>
+              <a href="${joinUrl}" style="background: white; color: #3b82f6; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+                Join Trip
+              </a>
+            </div>
+            
+            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h3 style="color: #374151; margin-bottom: 15px;">🌟 What you can do:</h3>
+              <ul style="color: #6b7280; margin: 0; padding-left: 20px;">
+                <li>Plan activities together</li>
+                <li>Split expenses fairly</li>
+                <li>Chat with the group</li>
+                <li>Create shared itineraries</li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center; color: #9ca3af; font-size: 14px; margin-top: 30px;">
+              <p>If the button doesn't work, copy and paste this link:</p>
+              <p style="color: #3b82f6; word-break: break-all; margin: 10px 0;">${joinUrl}</p>
+              <p style="margin-top: 20px;">
+                This invitation was sent by ${inviterName}. If you didn't expect this, you can safely ignore this email.
+              </p>
+              <p style="margin-top: 20px;">
+                Happy travels! ✈️<br>
+                The WanderTogether Team
+              </p>
+            </div>
+          </body>
+        </html>
       `,
     });
 
     console.log("Invitation email sent successfully:", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, data: emailResponse }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      emailId: emailResponse.data?.id,
+      message: "Invitation email sent successfully" 
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
         ...corsHeaders,
       },
     });
+
   } catch (error: any) {
-    console.error("Error sending invitation email:", error);
+    console.error("Error in send-invitation-email function:", error);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        success: false 
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
   }
-});
+};
+
+serve(handler);
