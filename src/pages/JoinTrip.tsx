@@ -65,7 +65,7 @@ const JoinTrip = () => {
             trip:trips(title, destination, description, start_date, end_date)
           `)
           .eq('invitation_token', urlToken)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
