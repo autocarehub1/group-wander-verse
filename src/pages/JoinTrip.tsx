@@ -42,6 +42,9 @@ const JoinTrip = () => {
       // Extract token from URL params
       const urlToken = token || window.location.pathname.split('/').pop();
       
+      console.log('Fetching invitation with token:', urlToken);
+      console.log('Full URL:', window.location.href);
+      
       if (!urlToken || urlToken === ':token' || urlToken === 'join') {
         setError('Invalid invitation link - please check the URL');
         setLoading(false);
@@ -51,12 +54,23 @@ const JoinTrip = () => {
       // Validate that token looks like a UUID
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(urlToken)) {
+        console.log('Token format invalid:', urlToken);
         setError('Invalid invitation token format');
         setLoading(false);
         return;
       }
 
       try {
+        console.log('Querying database for token:', urlToken);
+        
+        // First, let's try to find the invitation without RLS to see if it exists
+        const { data: allInvitations, error: allError } = await supabase
+          .from('trip_invitations')
+          .select('*')
+          .eq('invitation_token', urlToken);
+          
+        console.log('All invitations query result:', allInvitations, allError);
+
         const { data, error } = await supabase
           .from('trip_invitations')
           .select(`
@@ -67,10 +81,12 @@ const JoinTrip = () => {
           .eq('invitation_token', urlToken)
           .maybeSingle();
 
+        console.log('Invitation query result:', data, error);
+
         if (error) throw error;
 
         if (!data) {
-          setError('Invitation not found');
+          setError('Invitation not found - it may have expired or been revoked');
           return;
         }
 
@@ -86,6 +102,7 @@ const JoinTrip = () => {
 
         setInvitation(data as InvitationDetails);
       } catch (error: any) {
+        console.error('Error fetching invitation:', error);
         setError(error.message || 'Failed to load invitation');
       } finally {
         setLoading(false);
