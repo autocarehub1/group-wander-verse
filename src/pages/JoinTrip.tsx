@@ -103,7 +103,8 @@ const JoinTrip = () => {
     try {
       const tripId = await acceptInvitation(urlToken);
       if (tripId) {
-        navigate('/trips');
+        // Navigate to the specific trip that was just joined
+        navigate(`/trips?trip=${tripId}`);
       }
     } catch (error) {
       // Error is handled in the hook
