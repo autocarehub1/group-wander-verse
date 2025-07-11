@@ -15,7 +15,7 @@ interface UserProfile {
   dietary_restrictions?: any;
   accessibility_needs?: any;
   notification_preferences?: Record<string, boolean>;
-  privacy_settings?: Record<string, boolean>;
+  privacy_settings?: Record<string, any>;
   emergency_contact?: Record<string, any>;
 }
 

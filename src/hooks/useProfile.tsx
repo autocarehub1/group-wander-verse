@@ -15,7 +15,7 @@ interface UserProfile {
   dietary_restrictions?: any;
   accessibility_needs?: any;
   notification_preferences?: Record<string, boolean>;
-  privacy_settings?: Record<string, boolean>;
+  privacy_settings?: Record<string, any>;
   emergency_contact?: Record<string, any>;
 }
 
@@ -38,10 +38,33 @@ export const useProfile = () => {
         .from('users')
         .select('*')
         .eq('id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setProfile(data as UserProfile);
+      
+      if (!data) {
+        // Create a new profile for the user if none exists
+        const newProfile = {
+          id: user?.id,
+          email: user?.email || '',
+          full_name: user?.user_metadata?.full_name || '',
+          avatar_url: user?.user_metadata?.avatar_url || '',
+          travel_preferences: {},
+          dietary_restrictions: [],
+          accessibility_needs: [],
+          notification_preferences: { email: true, push: true, sms: false },
+          privacy_settings: { profile_visibility: 'friends', location_sharing: false }
+        };
+        
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert(newProfile);
+          
+        if (insertError) throw insertError;
+        setProfile(newProfile as UserProfile);
+      } else {
+        setProfile(data as UserProfile);
+      }
     } catch (error: any) {
       toast({
         title: "Error loading profile",
