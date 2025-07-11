@@ -58,7 +58,7 @@ export const useProfile = () => {
         
         const { error: insertError } = await supabase
           .from('users')
-          .insert(newProfile);
+          .upsert(newProfile, { onConflict: 'email' });
           
         if (insertError) throw insertError;
         setProfile(newProfile as UserProfile);
