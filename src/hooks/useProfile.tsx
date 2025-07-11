@@ -33,11 +33,16 @@ export const useProfile = () => {
   }, [user]);
 
   const fetchProfile = async () => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', user?.id)
+        .eq('id', user.id)
         .maybeSingle();
 
       if (error) throw error;
@@ -45,10 +50,10 @@ export const useProfile = () => {
       if (!data) {
         // Create a new profile for the user if none exists
         const newProfile = {
-          id: user?.id,
-          email: user?.email || '',
-          full_name: user?.user_metadata?.full_name || '',
-          avatar_url: user?.user_metadata?.avatar_url || '',
+          id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || '',
+          avatar_url: user.user_metadata?.avatar_url || '',
           travel_preferences: {},
           dietary_restrictions: [],
           accessibility_needs: [],
@@ -58,7 +63,7 @@ export const useProfile = () => {
         
         const { error: insertError } = await supabase
           .from('users')
-          .upsert(newProfile, { onConflict: 'email' });
+          .insert(newProfile);
           
         if (insertError) throw insertError;
         setProfile(newProfile as UserProfile);
