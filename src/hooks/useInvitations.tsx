@@ -183,23 +183,36 @@ export const useInvitations = (tripId?: string) => {
 
   const acceptInvitation = async (invitationToken: string) => {
     try {
+      console.log('🎯 Accepting invitation with token:', invitationToken);
+      console.log('👤 Current user:', user?.id);
+      
       const { data, error } = await supabase
         .rpc('accept_trip_invitation', { invitation_token: invitationToken });
 
-      if (error) throw error;
+      console.log('📥 RPC response data:', data);
+      console.log('❌ RPC response error:', error);
+
+      if (error) {
+        console.error('💥 RPC call failed:', error);
+        throw error;
+      }
 
       const result = data as { success: boolean; error?: string; trip_id?: string };
+      console.log('📊 Parsed result:', result);
       
       if (result.success) {
+        console.log('✅ Invitation accepted successfully!');
         toast({
           title: "Invitation accepted!",
           description: "You've successfully joined the trip."
         });
         return result.trip_id;
       } else {
+        console.error('❌ Invitation acceptance failed:', result.error);
         throw new Error(result.error || 'Failed to accept invitation');
       }
     } catch (error: any) {
+      console.error('💥 Error in acceptInvitation:', error);
       toast({
         title: "Error accepting invitation",
         description: error.message,
