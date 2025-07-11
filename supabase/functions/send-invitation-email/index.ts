@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending invitation email to:", inviteEmail);
 
-    const joinUrl = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/join/${invitationToken}`;
+    const joinUrl = `https://preview--group-wander-verse.lovable.app/join/${invitationToken}`;
 
     const emailResponse = await resend.emails.send({
       from: "WanderTogether <onboarding@resend.dev>",
