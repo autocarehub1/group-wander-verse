@@ -63,14 +63,18 @@ export const useProfile = () => {
         
         const { error: insertError } = await supabase
           .from('users')
-          .insert(newProfile);
+          .upsert(newProfile, { onConflict: 'id' });
           
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Profile creation error:', insertError);
+          throw insertError;
+        }
         setProfile(newProfile as UserProfile);
       } else {
         setProfile(data as UserProfile);
       }
     } catch (error: any) {
+      console.error('Profile fetch error:', error);
       toast({
         title: "Error loading profile",
         description: error.message,
