@@ -26,6 +26,17 @@ interface PersonalInfoTabProps {
 }
 
 export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
+  const handleFieldUpdate = (field: keyof UserProfile, value: string) => {
+    // Update local state immediately
+    setProfile(prev => prev ? { ...prev, [field]: value } : null);
+    // Debounce the actual update to database
+    const timeoutId = setTimeout(() => {
+      updateProfile({ [field]: value });
+    }, 1000);
+    
+    return () => clearTimeout(timeoutId);
+  };
+
   return (
     <Card className="travel-card">
       <CardHeader>
@@ -41,8 +52,16 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Input
               id="full-name"
               value={profile.full_name || ''}
-              onChange={(e) => setProfile(prev => prev ? { ...prev, full_name: e.target.value } : null)}
-              onBlur={(e) => updateProfile({ full_name: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value;
+                setProfile(prev => prev ? { ...prev, full_name: value } : null);
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== profile.full_name) {
+                  updateProfile({ full_name: value });
+                }
+              }}
             />
           </div>
           <div className="space-y-2">
@@ -50,8 +69,16 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Input
               id="phone"
               value={profile.phone || ''}
-              onChange={(e) => setProfile(prev => prev ? { ...prev, phone: e.target.value } : null)}
-              onBlur={(e) => updateProfile({ phone: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value;
+                setProfile(prev => prev ? { ...prev, phone: value } : null);
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== profile.phone) {
+                  updateProfile({ phone: value });
+                }
+              }}
             />
           </div>
         </div>
@@ -62,8 +89,16 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             id="bio"
             placeholder="Tell us about yourself and your travel interests..."
             value={profile.bio || ''}
-            onChange={(e) => setProfile(prev => prev ? { ...prev, bio: e.target.value } : null)}
-            onBlur={(e) => updateProfile({ bio: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              setProfile(prev => prev ? { ...prev, bio: value } : null);
+            }}
+            onBlur={(e) => {
+              const value = e.target.value;
+              if (value !== profile.bio) {
+                updateProfile({ bio: value });
+              }
+            }}
           />
         </div>
 
@@ -73,8 +108,16 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             id="dob"
             type="date"
             value={profile.date_of_birth || ''}
-            onChange={(e) => setProfile(prev => prev ? { ...prev, date_of_birth: e.target.value } : null)}
-            onBlur={(e) => updateProfile({ date_of_birth: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              setProfile(prev => prev ? { ...prev, date_of_birth: value } : null);
+            }}
+            onBlur={(e) => {
+              const value = e.target.value;
+              if (value !== profile.date_of_birth) {
+                updateProfile({ date_of_birth: value });
+              }
+            }}
           />
         </div>
       </CardContent>
