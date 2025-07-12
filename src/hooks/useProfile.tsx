@@ -86,14 +86,27 @@ export const useProfile = () => {
   };
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
+    if (!user?.id) {
+      toast({
+        title: "Error updating profile",
+        description: "User not authenticated",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSaving(true);
     try {
+      console.log('Updating profile with:', updates);
       const { error } = await supabase
         .from('users')
         .update(updates)
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Update error:', error);
+        throw error;
+      }
 
       setProfile(prev => prev ? { ...prev, ...updates } : null);
       toast({
@@ -101,6 +114,7 @@ export const useProfile = () => {
         description: "Your profile has been successfully updated."
       });
     } catch (error: any) {
+      console.error('Profile update error:', error);
       toast({
         title: "Error updating profile",
         description: error.message,
