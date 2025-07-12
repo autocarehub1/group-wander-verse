@@ -53,15 +53,20 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
               id="full-name"
               value={profile.full_name || ''}
               onChange={(e) => {
+                console.log('Full name onChange triggered:', e.target.value);
                 const value = e.target.value;
                 setProfile(prev => prev ? { ...prev, full_name: value } : null);
               }}
               onBlur={(e) => {
+                console.log('Full name onBlur triggered:', e.target.value);
                 const value = e.target.value;
                 if (value !== profile.full_name) {
                   updateProfile({ full_name: value });
                 }
               }}
+              placeholder="Enter your full name"
+              disabled={false}
+              readOnly={false}
             />
           </div>
           <div className="space-y-2">
@@ -70,15 +75,20 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
               id="phone"
               value={profile.phone || ''}
               onChange={(e) => {
+                console.log('Phone onChange triggered:', e.target.value);
                 const value = e.target.value;
                 setProfile(prev => prev ? { ...prev, phone: value } : null);
               }}
               onBlur={(e) => {
+                console.log('Phone onBlur triggered:', e.target.value);
                 const value = e.target.value;
                 if (value !== profile.phone) {
                   updateProfile({ phone: value });
                 }
               }}
+              placeholder="Enter your phone number"
+              disabled={false}
+              readOnly={false}
             />
           </div>
         </div>
@@ -90,15 +100,19 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             placeholder="Tell us about yourself and your travel interests..."
             value={profile.bio || ''}
             onChange={(e) => {
+              console.log('Bio onChange triggered:', e.target.value);
               const value = e.target.value;
               setProfile(prev => prev ? { ...prev, bio: value } : null);
             }}
             onBlur={(e) => {
+              console.log('Bio onBlur triggered:', e.target.value);
               const value = e.target.value;
               if (value !== profile.bio) {
                 updateProfile({ bio: value });
               }
             }}
+            disabled={false}
+            readOnly={false}
           />
         </div>
 
@@ -109,15 +123,19 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             type="date"
             value={profile.date_of_birth || ''}
             onChange={(e) => {
+              console.log('DOB onChange triggered:', e.target.value);
               const value = e.target.value;
               setProfile(prev => prev ? { ...prev, date_of_birth: value } : null);
             }}
             onBlur={(e) => {
+              console.log('DOB onBlur triggered:', e.target.value);
               const value = e.target.value;
               if (value !== profile.date_of_birth) {
                 updateProfile({ date_of_birth: value });
               }
             }}
+            disabled={false}
+            readOnly={false}
           />
         </div>
       </CardContent>
