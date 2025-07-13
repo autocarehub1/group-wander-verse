@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 interface UserProfile {
   id: string;
@@ -29,127 +28,80 @@ interface PersonalInfoTabProps {
 
 export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
   const [formData, setFormData] = useState({
-    full_name: '',
-    phone: '',
-    bio: '',
-    date_of_birth: ''
+    full_name: profile?.full_name || '',
+    phone: profile?.phone || '',
+    bio: profile?.bio || '',
+    date_of_birth: profile?.date_of_birth || ''
   });
 
-  // Simple test function
-  const testUpdate = () => {
-    console.log('=== BASIC TEST ===');
-    console.log('Profile exists:', !!profile);
-    console.log('UpdateProfile function exists:', !!updateProfile);
-    
-    try {
-      updateProfile({ bio: 'Test bio update' });
-      console.log('✅ Update function called successfully');
-    } catch (error) {
-      console.error('❌ Update function failed:', error);
-    }
-  };
-
   const handleInputChange = (field: string, value: string) => {
-    console.log(`✏️ Input change: ${field} = "${value}"`);
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSave = (field: string) => {
     const value = formData[field as keyof typeof formData];
-    console.log(`💾 Saving: ${field} = "${value}"`);
-    
-    try {
-      updateProfile({ [field]: value });
-      console.log('✅ Save successful');
-    } catch (error) {
-      console.error('❌ Save failed:', error);
-    }
+    updateProfile({ [field]: value });
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Personal Information</CardTitle>
-        <CardDescription>
-          Basic profile editing test
+    <Card className="travel-card">
+      <CardHeader className="pb-4 sm:pb-6">
+        <CardTitle className="text-xl sm:text-2xl">Personal Information</CardTitle>
+        <CardDescription className="text-sm sm:text-base">
+          Update your personal details and profile information
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Debug Panel */}
-        <div className="bg-yellow-100 dark:bg-yellow-900 p-4 rounded">
-          <h3 className="font-bold mb-2">🔧 Debug Panel</h3>
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
-            <Button onClick={testUpdate} className="w-full">
-              Test Update Function
-            </Button>
-            <div className="text-sm">
-              <p>Profile loaded: {profile ? '✅ Yes' : '❌ No'}</p>
-              <p>Current name: {profile?.full_name || 'None'}</p>
-              <p>Current email: {profile?.email || 'None'}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Simple Form */}
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="full-name" className="text-sm font-medium">Full Name</Label>
             <Input
-              id="name"
+              id="full-name"
               type="text"
               value={formData.full_name}
               onChange={(e) => handleInputChange('full_name', e.target.value)}
               onBlur={() => handleSave('full_name')}
-              placeholder="Type your name here"
+              placeholder="Enter your full name"
+              autoComplete="name"
             />
           </div>
-
-          <div>
-            <Label htmlFor="phone">Phone</Label>
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
               onBlur={() => handleSave('phone')}
-              placeholder="Type your phone here"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="bio">Bio</Label>
-            <Textarea
-              id="bio"
-              value={formData.bio}
-              onChange={(e) => handleInputChange('bio', e.target.value)}
-              onBlur={() => handleSave('bio')}
-              placeholder="Type your bio here"
-              rows={3}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="dob">Date of Birth</Label>
-            <Input
-              id="dob"
-              type="date"
-              value={formData.date_of_birth}
-              onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-              onBlur={() => handleSave('date_of_birth')}
+              placeholder="Enter your phone number"
+              autoComplete="tel"
             />
           </div>
         </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
+          <Textarea
+            id="bio"
+            placeholder="Tell us about yourself and your travel interests..."
+            value={formData.bio}
+            onChange={(e) => handleInputChange('bio', e.target.value)}
+            onBlur={() => handleSave('bio')}
+            rows={4}
+          />
+        </div>
 
-        {/* Manual Save Button */}
-        <Button 
-          onClick={() => {
-            console.log('Manual save clicked');
-            updateProfile(formData);
-          }}
-          className="w-full"
-        >
-          Save All Changes
-        </Button>
+        <div className="space-y-2">
+          <Label htmlFor="dob" className="text-sm font-medium">Date of Birth</Label>
+          <Input
+            id="dob"
+            type="date"
+            value={formData.date_of_birth}
+            onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+            onBlur={() => handleSave('date_of_birth')}
+            max={new Date().toISOString().split('T')[0]}
+          />
+        </div>
       </CardContent>
     </Card>
   );

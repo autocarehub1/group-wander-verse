@@ -30,44 +30,33 @@ export const TravelPreferencesTab = ({
   toggleDietaryRestriction, 
   toggleAccessibilityNeed 
 }: TravelPreferencesTabProps) => {
-  
-  const testPreference = () => {
-    console.log('=== PREFERENCE TEST ===');
-    console.log('Current preferences:', profile?.travel_preferences);
-    try {
-      togglePreference('Adventure');
-      console.log('✅ Preference toggle successful');
-    } catch (error) {
-      console.error('❌ Preference toggle failed:', error);
-    }
-  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Travel Preferences {saving && '(Saving...)'}</CardTitle>
-          <CardDescription>Simple preference testing</CardDescription>
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <span className="text-xl sm:text-2xl">Travel Preferences</span>
+            {saving && <div className="flex items-center text-sm text-muted-foreground">
+              <div className="animate-spin rounded-full h-4 w-4 border-b border-primary mr-2"></div>
+              Saving...
+            </div>}
+          </CardTitle>
+          <CardDescription className="text-sm sm:text-base">
+            Help us personalize your travel recommendations
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Test Button */}
-          <Button onClick={testPreference} className="w-full">
-            Test Preference Toggle
-          </Button>
-          
-          {/* Simple Preferences */}
+          {/* Travel Preferences */}
           <div className="space-y-2">
-            <h4 className="font-medium">Travel Types:</h4>
+            <h4 className="font-medium text-base sm:text-lg">Travel Types:</h4>
             <div className="flex flex-wrap gap-2">
               {basicPreferences.map((pref) => (
                 <Badge
                   key={pref}
                   variant={profile?.travel_preferences?.[pref] ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    console.log(`Clicking preference: ${pref}`);
-                    togglePreference(pref);
-                  }}
+                  className="cursor-pointer hover-scale transition-all duration-200 text-xs sm:text-sm"
+                  onClick={() => togglePreference(pref)}
                 >
                   {pref}
                 </Badge>
@@ -75,19 +64,16 @@ export const TravelPreferencesTab = ({
             </div>
           </div>
 
-          {/* Simple Dietary */}
+          {/* Dietary Restrictions */}
           <div className="space-y-2">
-            <h4 className="font-medium">Dietary:</h4>
+            <h4 className="font-medium text-base sm:text-lg">Dietary:</h4>
             <div className="flex flex-wrap gap-2">
               {basicDietary.map((item) => (
                 <Badge
                   key={item}
                   variant={profile?.dietary_restrictions?.includes?.(item) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    console.log(`Clicking dietary: ${item}`);
-                    toggleDietaryRestriction(item);
-                  }}
+                  className="cursor-pointer hover-scale transition-all duration-200 text-xs sm:text-sm"
+                  onClick={() => toggleDietaryRestriction(item)}
                 >
                   {item}
                 </Badge>
@@ -95,19 +81,16 @@ export const TravelPreferencesTab = ({
             </div>
           </div>
 
-          {/* Simple Accessibility */}
+          {/* Accessibility Needs */}
           <div className="space-y-2">
-            <h4 className="font-medium">Accessibility:</h4>
+            <h4 className="font-medium text-base sm:text-lg">Accessibility:</h4>
             <div className="flex flex-wrap gap-2">
               {basicAccessibility.map((item) => (
                 <Badge
                   key={item}
-                  variant={profile?.accessibility_needs?.includes?.(item) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    console.log(`Clicking accessibility: ${item}`);
-                    toggleAccessibilityNeed(item);
-                  }}
+                  variant={profile?.accessibility_needs?.includes?.(item) ? "secondary" : "outline"}
+                  className="cursor-pointer hover-scale transition-all duration-200 text-xs sm:text-sm"
+                  onClick={() => toggleAccessibilityNeed(item)}
                 >
                   {item}
                 </Badge>
