@@ -94,7 +94,14 @@ const Profile = () => {
 
             <TabsContent value="preferences">
               <TravelPreferencesTab 
-                profile={profile}
+                profile={profile || { 
+                  id: user?.id || '',
+                  email: user?.email || '',
+                  full_name: '',
+                  travel_preferences: {},
+                  dietary_restrictions: [],
+                  accessibility_needs: []
+                }}
                 saving={saving}
                 togglePreference={togglePreference}
                 toggleDietaryRestriction={toggleDietaryRestriction}
@@ -104,7 +111,13 @@ const Profile = () => {
 
             <TabsContent value="settings">
               <AccountSettingsTab 
-                profile={profile} 
+                profile={profile || { 
+                  id: user?.id || '',
+                  email: user?.email || '',
+                  full_name: '',
+                  notification_preferences: { email: true, push: true, sms: false },
+                  privacy_settings: { location_sharing: false, profile_visibility: 'friends' }
+                }} 
                 updateProfile={updateProfile} 
               />
             </TabsContent>

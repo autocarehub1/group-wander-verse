@@ -116,23 +116,23 @@ export const TravelPreferencesTab = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <TooltipProvider>
         <Card className="travel-card">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              Travel Preferences
+          <CardHeader className="pb-4 sm:pb-6">
+            <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <span className="text-xl sm:text-2xl">Travel Preferences</span>
               {saving && <div className="flex items-center text-sm text-muted-foreground">
                 <div className="animate-spin rounded-full h-4 w-4 border-b border-primary mr-2"></div>
                 Saving...
               </div>}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               Help us personalize your travel recommendations
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
@@ -146,26 +146,30 @@ export const TravelPreferencesTab = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowingCustomInputs({ ...showingCustomInputs, travel: !showingCustomInputs.travel })}
+                className="shrink-0"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Add Custom</span>
               </Button>
             </div>
             
             {showingCustomInputs.travel && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 animate-fade-in">
                 <Input
                   placeholder="Add custom travel preference..."
                   value={customTravel}
                   onChange={(e) => setCustomTravel(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addCustomTravel()}
+                  className="flex-1"
                 />
-                <Button size="sm" onClick={addCustomTravel}>
+                <Button size="sm" onClick={addCustomTravel} className="shrink-0">
                   <Check className="h-4 w-4" />
                 </Button>
                 <Button 
                   size="sm" 
                   variant="outline" 
                   onClick={() => setShowingCustomInputs({ ...showingCustomInputs, travel: false })}
+                  className="shrink-0"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -177,18 +181,18 @@ export const TravelPreferencesTab = ({
                 <Tooltip key={pref}>
                   <TooltipTrigger>
                     <Badge
-                      variant={profile.travel_preferences?.[pref] ? "default" : "outline"}
-                      className="cursor-pointer hover:scale-105 transition-transform"
+                      variant={profile?.travel_preferences?.[pref] ? "default" : "outline"}
+                      className="cursor-pointer hover-scale transition-all duration-200 text-xs sm:text-sm"
                       onClick={() => togglePreference(pref)}
                     >
                       {pref}
-                      {profile.travel_preferences?.[pref] && (
+                      {profile?.travel_preferences?.[pref] && (
                         <Check className="ml-1 h-3 w-3" />
                       )}
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Click to {profile.travel_preferences?.[pref] ? 'remove' : 'add'} this preference</p>
+                    <p>Click to {profile?.travel_preferences?.[pref] ? 'remove' : 'add'} this preference</p>
                   </TooltipContent>
                 </Tooltip>
               ))}
