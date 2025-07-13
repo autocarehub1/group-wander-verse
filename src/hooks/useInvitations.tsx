@@ -165,9 +165,11 @@ export const useInvitations = (tripId?: string) => {
 
       await fetchInvitations();
       
+      // Show notification for successful invitation
+      const recipientInfo = inviteData.invite_value ? ` to ${inviteData.invite_value}` : '';
       toast({
-        title: "Invitation sent successfully",
-        description: `Invitation has been sent via ${inviteData.invite_type}.`
+        title: "🎉 Invitation sent!",
+        description: `Trip invitation has been sent via ${inviteData.invite_type}${recipientInfo}`,
       });
 
       return invitation;
