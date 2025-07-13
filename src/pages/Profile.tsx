@@ -36,41 +36,43 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-sky py-8">
-      <div className="container mx-auto px-6">
+    <div className="min-h-screen bg-gradient-sky py-4 sm:py-8">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
+          <div className="text-center mb-6 sm:mb-8">
+            <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 border-4 border-primary/20">
               <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="bg-gradient-hero text-white text-2xl">
+              <AvatarFallback className="bg-gradient-hero text-white text-xl sm:text-2xl">
                 {profile?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <h1 className="text-3xl font-bold mb-2">{profile?.full_name || 'Anonymous Traveler'}</h1>
-            <p className="text-muted-foreground">{profile?.email || user?.email}</p>
-            <Button onClick={handleLogout} variant="outline" className="mt-4">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">{profile?.full_name || 'Anonymous Traveler'}</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">{profile?.email || user?.email}</p>
+            <Button onClick={handleLogout} variant="outline" className="mt-3 sm:mt-4">
               Sign Out
             </Button>
           </div>
 
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="profile">
-                <User className="w-4 h-4 mr-2" />
-                Profile
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+              <TabsTrigger value="profile" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">Profile</span>
+                <span className="sm:hidden">Info</span>
               </TabsTrigger>
-              <TabsTrigger value="preferences">
-                <MapPin className="w-4 h-4 mr-2" />
-                Travel
+              <TabsTrigger value="preferences" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <MapPin className="w-4 h-4" />
+                <span>Travel</span>
               </TabsTrigger>
-              <TabsTrigger value="settings">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+              <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Settings</span>
+                <span className="sm:hidden">Config</span>
               </TabsTrigger>
-              <TabsTrigger value="history">
-                <Star className="w-4 h-4 mr-2" />
-                History
+              <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Star className="w-4 h-4" />
+                <span>History</span>
               </TabsTrigger>
             </TabsList>
 

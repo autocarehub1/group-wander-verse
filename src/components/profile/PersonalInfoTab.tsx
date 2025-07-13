@@ -39,16 +39,16 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
 
   return (
     <Card className="travel-card">
-      <CardHeader>
-        <CardTitle>Personal Information</CardTitle>
-        <CardDescription>
+      <CardHeader className="pb-4 sm:pb-6">
+        <CardTitle className="text-xl sm:text-2xl">Personal Information</CardTitle>
+        <CardDescription className="text-sm sm:text-base">
           Update your personal details and profile information
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
-            <Label htmlFor="full-name">Full Name</Label>
+            <Label htmlFor="full-name" className="text-sm font-medium">Full Name</Label>
             <Input
               id="full-name"
               type="text"
@@ -68,7 +68,7 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
             <Input
               id="phone"
               type="tel"
@@ -90,7 +90,7 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="bio">Bio</Label>
+          <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
           <Textarea
             id="bio"
             placeholder="Tell us about yourself and your travel interests..."
@@ -110,7 +110,7 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob">Date of Birth</Label>
+          <Label htmlFor="dob" className="text-sm font-medium">Date of Birth</Label>
           <Input
             id="dob"
             type="date"
