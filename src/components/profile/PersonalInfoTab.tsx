@@ -26,6 +26,12 @@ interface PersonalInfoTabProps {
 }
 
 export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
+  // Add a test function to verify updates work
+  const testUpdate = () => {
+    console.log('Testing profile update...');
+    updateProfile({ bio: `Updated at ${new Date().toISOString()}` });
+  };
+
   const handleFieldUpdate = (field: keyof UserProfile, value: string) => {
     // Update local state immediately
     setProfile(prev => prev ? { ...prev, [field]: value } : null);
@@ -46,6 +52,18 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6">
+        {/* Test button to verify updates work */}
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-md">
+          <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
+            Debug: Click to test if profile updates work
+          </p>
+          <button 
+            onClick={testUpdate}
+            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+          >
+            Test Update
+          </button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
             <Label htmlFor="full-name" className="text-sm font-medium">Full Name</Label>
