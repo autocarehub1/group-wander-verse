@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,40 +26,28 @@ interface PersonalInfoTabProps {
 }
 
 export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
-  const [localState, setLocalState] = useState({
-    full_name: profile?.full_name || '',
-    phone: profile?.phone || '',
-    bio: profile?.bio || '',
-    date_of_birth: profile?.date_of_birth || ''
-  });
-
-  // Update local state when profile changes
-  useEffect(() => {
-    setLocalState({
-      full_name: profile?.full_name || '',
-      phone: profile?.phone || '',
-      bio: profile?.bio || '',
-      date_of_birth: profile?.date_of_birth || ''
-    });
-  }, [profile]);
-
-  const handleChange = (field: string, value: string) => {
-    console.log(`TEST: Changing ${field} to:`, value);
-    setLocalState(prev => ({ ...prev, [field]: value }));
+  // Simplified state management - no local state, direct updates
+  const handleInputChange = (field: string, value: string) => {
+    console.log(`Input changed - ${field}:`, value);
+    // Update parent state immediately for responsive UI
+    if (setProfile) {
+      setProfile(prev => prev ? { ...prev, [field]: value } : null);
+    }
   };
 
-  const handleSave = (field: string, value: string) => {
-    console.log(`TEST: Saving ${field} with value:`, value);
+  const handleInputBlur = (field: string, value: string) => {
+    console.log(`Saving ${field}:`, value);
+    // Save to database
     updateProfile({ [field]: value });
   };
 
-  // Test function to verify all functionality
-  const runTests = () => {
-    console.log('=== PROFILE COMPONENT TESTS ===');
-    console.log('1. Profile data:', profile);
-    console.log('2. Local state:', localState);
-    console.log('3. Testing manual update...');
-    updateProfile({ bio: `Test update at ${new Date().toLocaleTimeString()}` });
+  // Simple test function
+  const testProfileUpdate = () => {
+    console.log('=== TESTING PROFILE UPDATE ===');
+    console.log('Profile data:', profile);
+    const testData = { bio: `Test update ${new Date().toLocaleTimeString()}` };
+    console.log('Updating with:', testData);
+    updateProfile(testData);
   };
 
   return (
@@ -72,29 +59,15 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6">
-        {/* Test Panel */}
+        {/* Simplified Test Panel */}
         <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">🧪 Test Panel</p>
-          <div className="flex flex-wrap gap-2">
-            <button 
-              onClick={runTests}
-              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-            >
-              Run Tests
-            </button>
-            <button 
-              onClick={() => console.log('Current profile:', profile)}
-              className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
-            >
-              Log Profile
-            </button>
-            <button 
-              onClick={() => handleSave('bio', `Auto-test ${new Date().toLocaleTimeString()}`)}
-              className="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600"
-            >
-              Test Save
-            </button>
-          </div>
+          <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">🧪 Quick Test</p>
+          <button 
+            onClick={testProfileUpdate}
+            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+          >
+            Test Profile Update
+          </button>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
@@ -102,9 +75,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Input
               id="full-name"
               type="text"
-              value={localState.full_name}
-              onChange={(e) => handleChange('full_name', e.target.value)}
-              onBlur={(e) => handleSave('full_name', e.target.value)}
+              value={profile?.full_name || ''}
+              onChange={(e) => handleInputChange('full_name', e.target.value)}
+              onBlur={(e) => handleInputBlur('full_name', e.target.value)}
               placeholder="Enter your full name"
               autoComplete="name"
             />
@@ -114,9 +87,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Input
               id="phone"
               type="tel"
-              value={localState.phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
-              onBlur={(e) => handleSave('phone', e.target.value)}
+              value={profile?.phone || ''}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+              onBlur={(e) => handleInputBlur('phone', e.target.value)}
               placeholder="Enter your phone number"
               autoComplete="tel"
             />
@@ -128,9 +101,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
           <Textarea
             id="bio"
             placeholder="Tell us about yourself and your travel interests..."
-            value={localState.bio}
-            onChange={(e) => handleChange('bio', e.target.value)}
-            onBlur={(e) => handleSave('bio', e.target.value)}
+            value={profile?.bio || ''}
+            onChange={(e) => handleInputChange('bio', e.target.value)}
+            onBlur={(e) => handleInputBlur('bio', e.target.value)}
             rows={4}
           />
         </div>
@@ -140,9 +113,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
           <Input
             id="dob"
             type="date"
-            value={localState.date_of_birth}
-            onChange={(e) => handleChange('date_of_birth', e.target.value)}
-            onBlur={(e) => handleSave('date_of_birth', e.target.value)}
+            value={profile?.date_of_birth || ''}
+            onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+            onBlur={(e) => handleInputBlur('date_of_birth', e.target.value)}
             max={new Date().toISOString().split('T')[0]}
           />
         </div>
