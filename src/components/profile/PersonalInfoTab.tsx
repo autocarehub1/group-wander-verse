@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,21 +27,29 @@ interface PersonalInfoTabProps {
 }
 
 export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
-  // Add a test function to verify updates work
-  const testUpdate = () => {
-    console.log('Testing profile update...');
-    updateProfile({ bio: `Updated at ${new Date().toISOString()}` });
+  const [localState, setLocalState] = useState({
+    full_name: profile?.full_name || '',
+    phone: profile?.phone || '',
+    bio: profile?.bio || '',
+    date_of_birth: profile?.date_of_birth || ''
+  });
+
+  // Update local state when profile changes
+  useEffect(() => {
+    setLocalState({
+      full_name: profile?.full_name || '',
+      phone: profile?.phone || '',
+      bio: profile?.bio || '',
+      date_of_birth: profile?.date_of_birth || ''
+    });
+  }, [profile]);
+
+  const handleChange = (field: string, value: string) => {
+    setLocalState(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFieldUpdate = (field: keyof UserProfile, value: string) => {
-    // Update local state immediately
-    setProfile(prev => prev ? { ...prev, [field]: value } : null);
-    // Debounce the actual update to database
-    const timeoutId = setTimeout(() => {
-      updateProfile({ [field]: value });
-    }, 1000);
-    
-    return () => clearTimeout(timeoutId);
+  const handleSave = (field: string, value: string) => {
+    updateProfile({ [field]: value });
   };
 
   return (
@@ -52,35 +61,15 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6">
-        {/* Test button to verify updates work */}
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-md">
-          <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-            Debug: Click to test if profile updates work
-          </p>
-          <button 
-            onClick={testUpdate}
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-          >
-            Test Update
-          </button>
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
             <Label htmlFor="full-name" className="text-sm font-medium">Full Name</Label>
             <Input
               id="full-name"
               type="text"
-              value={profile?.full_name || ''}
-              onChange={(e) => {
-                console.log('Full name changing:', e.target.value);
-                const value = e.target.value;
-                setProfile(prev => prev ? { ...prev, full_name: value } : null);
-              }}
-              onBlur={(e) => {
-                console.log('Full name blur:', e.target.value);
-                const value = e.target.value;
-                updateProfile({ full_name: value });
-              }}
+              value={localState.full_name}
+              onChange={(e) => handleChange('full_name', e.target.value)}
+              onBlur={(e) => handleSave('full_name', e.target.value)}
               placeholder="Enter your full name"
               autoComplete="name"
             />
@@ -90,17 +79,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Input
               id="phone"
               type="tel"
-              value={profile?.phone || ''}
-              onChange={(e) => {
-                console.log('Phone changing:', e.target.value);
-                const value = e.target.value;
-                setProfile(prev => prev ? { ...prev, phone: value } : null);
-              }}
-              onBlur={(e) => {
-                console.log('Phone blur:', e.target.value);
-                const value = e.target.value;
-                updateProfile({ phone: value });
-              }}
+              value={localState.phone}
+              onChange={(e) => handleChange('phone', e.target.value)}
+              onBlur={(e) => handleSave('phone', e.target.value)}
               placeholder="Enter your phone number"
               autoComplete="tel"
             />
@@ -112,17 +93,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
           <Textarea
             id="bio"
             placeholder="Tell us about yourself and your travel interests..."
-            value={profile?.bio || ''}
-            onChange={(e) => {
-              console.log('Bio changing:', e.target.value);
-              const value = e.target.value;
-              setProfile(prev => prev ? { ...prev, bio: value } : null);
-            }}
-            onBlur={(e) => {
-              console.log('Bio blur:', e.target.value);
-              const value = e.target.value;
-              updateProfile({ bio: value });
-            }}
+            value={localState.bio}
+            onChange={(e) => handleChange('bio', e.target.value)}
+            onBlur={(e) => handleSave('bio', e.target.value)}
             rows={4}
           />
         </div>
@@ -132,17 +105,9 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
           <Input
             id="dob"
             type="date"
-            value={profile?.date_of_birth || ''}
-            onChange={(e) => {
-              console.log('DOB changing:', e.target.value);
-              const value = e.target.value;
-              setProfile(prev => prev ? { ...prev, date_of_birth: value } : null);
-            }}
-            onBlur={(e) => {
-              console.log('DOB blur:', e.target.value);
-              const value = e.target.value;
-              updateProfile({ date_of_birth: value });
-            }}
+            value={localState.date_of_birth}
+            onChange={(e) => handleChange('date_of_birth', e.target.value)}
+            onBlur={(e) => handleSave('date_of_birth', e.target.value)}
             max={new Date().toISOString().split('T')[0]}
           />
         </div>
