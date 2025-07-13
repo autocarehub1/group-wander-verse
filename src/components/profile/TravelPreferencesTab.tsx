@@ -49,11 +49,21 @@ export const TravelPreferencesTab = ({
 
   // Custom option handlers
   const addCustomTravel = () => {
+    console.log('TEST: Adding custom travel preference:', customTravel);
     if (customTravel.trim()) {
       togglePreference(customTravel.trim());
       setCustomTravel('');
       setShowingCustomInputs({ ...showingCustomInputs, travel: false });
     }
+  };
+
+  // Test function for travel preferences
+  const testTravelPreferences = () => {
+    console.log('=== TRAVEL PREFERENCES TESTS ===');
+    console.log('1. Current preferences:', profile?.travel_preferences);
+    console.log('2. Available options:', travelPreferences);
+    console.log('3. Testing toggle...');
+    togglePreference('Adventure');
   };
 
   const addCustomDietary = () => {
@@ -132,6 +142,16 @@ export const TravelPreferencesTab = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Test Panel for Travel Preferences */}
+            <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg">
+              <p className="text-sm text-green-800 dark:text-green-200 mb-2">🧪 Travel Preferences Test</p>
+              <button 
+                onClick={testTravelPreferences}
+                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+              >
+                Test Travel Preferences
+              </button>
+            </div>
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />

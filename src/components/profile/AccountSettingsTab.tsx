@@ -24,6 +24,15 @@ interface AccountSettingsTabProps {
 }
 
 export const AccountSettingsTab = ({ profile, updateProfile }: AccountSettingsTabProps) => {
+  const testSettings = () => {
+    console.log('=== ACCOUNT SETTINGS TESTS ===');
+    console.log('1. Current notifications:', profile?.notification_preferences);
+    console.log('2. Current privacy:', profile?.privacy_settings);
+    console.log('3. Testing toggle...');
+    const prefs = { ...profile?.notification_preferences, email: !profile?.notification_preferences?.email };
+    updateProfile({ notification_preferences: prefs });
+  };
+
   return (
     <Card className="travel-card">
       <CardHeader className="pb-4 sm:pb-6">
@@ -33,6 +42,16 @@ export const AccountSettingsTab = ({ profile, updateProfile }: AccountSettingsTa
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6">
+        {/* Test Panel for Settings */}
+        <div className="bg-purple-50 dark:bg-purple-950 p-3 rounded-lg">
+          <p className="text-sm text-purple-800 dark:text-purple-200 mb-2">🧪 Settings Test</p>
+          <button 
+            onClick={testSettings}
+            className="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600"
+          >
+            Test Settings Toggle
+          </button>
+        </div>
         <div className="space-y-4">
           <h3 className="font-medium text-base sm:text-lg">Notification Preferences</h3>
           <div className="space-y-3 sm:space-y-4">

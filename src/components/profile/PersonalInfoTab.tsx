@@ -45,11 +45,22 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
   }, [profile]);
 
   const handleChange = (field: string, value: string) => {
+    console.log(`TEST: Changing ${field} to:`, value);
     setLocalState(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSave = (field: string, value: string) => {
+    console.log(`TEST: Saving ${field} with value:`, value);
     updateProfile({ [field]: value });
+  };
+
+  // Test function to verify all functionality
+  const runTests = () => {
+    console.log('=== PROFILE COMPONENT TESTS ===');
+    console.log('1. Profile data:', profile);
+    console.log('2. Local state:', localState);
+    console.log('3. Testing manual update...');
+    updateProfile({ bio: `Test update at ${new Date().toLocaleTimeString()}` });
   };
 
   return (
@@ -61,6 +72,30 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 sm:space-y-6">
+        {/* Test Panel */}
+        <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
+          <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">🧪 Test Panel</p>
+          <div className="flex flex-wrap gap-2">
+            <button 
+              onClick={runTests}
+              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+            >
+              Run Tests
+            </button>
+            <button 
+              onClick={() => console.log('Current profile:', profile)}
+              className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+            >
+              Log Profile
+            </button>
+            <button 
+              onClick={() => handleSave('bio', `Auto-test ${new Date().toLocaleTimeString()}`)}
+              className="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600"
+            >
+              Test Save
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
             <Label htmlFor="full-name" className="text-sm font-medium">Full Name</Label>
