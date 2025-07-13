@@ -51,18 +51,14 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Label htmlFor="full-name">Full Name</Label>
             <Input
               id="full-name"
-              value={profile.full_name || ''}
+              value={profile?.full_name || ''}
               onChange={(e) => {
-                console.log('Full name onChange triggered:', e.target.value);
                 const value = e.target.value;
                 setProfile(prev => prev ? { ...prev, full_name: value } : null);
               }}
               onBlur={(e) => {
-                console.log('Full name onBlur triggered:', e.target.value);
                 const value = e.target.value;
-                if (value !== profile.full_name) {
-                  updateProfile({ full_name: value });
-                }
+                updateProfile({ full_name: value });
               }}
               placeholder="Enter your full name"
               disabled={false}
@@ -73,18 +69,14 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
             <Label htmlFor="phone">Phone Number</Label>
             <Input
               id="phone"
-              value={profile.phone || ''}
+              value={profile?.phone || ''}
               onChange={(e) => {
-                console.log('Phone onChange triggered:', e.target.value);
                 const value = e.target.value;
                 setProfile(prev => prev ? { ...prev, phone: value } : null);
               }}
               onBlur={(e) => {
-                console.log('Phone onBlur triggered:', e.target.value);
                 const value = e.target.value;
-                if (value !== profile.phone) {
-                  updateProfile({ phone: value });
-                }
+                updateProfile({ phone: value });
               }}
               placeholder="Enter your phone number"
               disabled={false}
@@ -98,18 +90,14 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
           <Textarea
             id="bio"
             placeholder="Tell us about yourself and your travel interests..."
-            value={profile.bio || ''}
+            value={profile?.bio || ''}
             onChange={(e) => {
-              console.log('Bio onChange triggered:', e.target.value);
               const value = e.target.value;
               setProfile(prev => prev ? { ...prev, bio: value } : null);
             }}
             onBlur={(e) => {
-              console.log('Bio onBlur triggered:', e.target.value);
               const value = e.target.value;
-              if (value !== profile.bio) {
-                updateProfile({ bio: value });
-              }
+              updateProfile({ bio: value });
             }}
             disabled={false}
             readOnly={false}
@@ -121,18 +109,14 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
           <Input
             id="dob"
             type="date"
-            value={profile.date_of_birth || ''}
+            value={profile?.date_of_birth || ''}
             onChange={(e) => {
-              console.log('DOB onChange triggered:', e.target.value);
               const value = e.target.value;
               setProfile(prev => prev ? { ...prev, date_of_birth: value } : null);
             }}
             onBlur={(e) => {
-              console.log('DOB onBlur triggered:', e.target.value);
               const value = e.target.value;
-              if (value !== profile.date_of_birth) {
-                updateProfile({ date_of_birth: value });
-              }
+              updateProfile({ date_of_birth: value });
             }}
             disabled={false}
             readOnly={false}
