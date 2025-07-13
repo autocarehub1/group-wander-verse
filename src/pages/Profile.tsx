@@ -35,24 +35,6 @@ const Profile = () => {
     );
   }
 
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gradient-sky flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle>Profile Not Found</CardTitle>
-            <CardDescription>Unable to load your profile information.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={handleLogout} variant="outline" className="w-full">
-              Sign Out
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-sky py-8">
       <div className="container mx-auto px-6">
@@ -60,13 +42,13 @@ const Profile = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20">
-              <AvatarImage src={profile.avatar_url} />
+              <AvatarImage src={profile?.avatar_url} />
               <AvatarFallback className="bg-gradient-hero text-white text-2xl">
-                {profile.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase()}
+                {profile?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <h1 className="text-3xl font-bold mb-2">{profile.full_name || 'Anonymous Traveler'}</h1>
-            <p className="text-muted-foreground">{profile.email}</p>
+            <h1 className="text-3xl font-bold mb-2">{profile?.full_name || 'Anonymous Traveler'}</h1>
+            <p className="text-muted-foreground">{profile?.email || user?.email}</p>
             <Button onClick={handleLogout} variant="outline" className="mt-4">
               Sign Out
             </Button>
@@ -94,7 +76,15 @@ const Profile = () => {
 
             <TabsContent value="profile">
               <PersonalInfoTab 
-                profile={profile} 
+                profile={profile || { 
+                  id: user?.id || '',
+                  email: user?.email || '',
+                  full_name: '',
+                  avatar_url: '',
+                  phone: '',
+                  bio: '',
+                  date_of_birth: ''
+                }} 
                 setProfile={setProfile} 
                 updateProfile={updateProfile} 
               />
