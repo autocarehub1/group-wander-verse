@@ -2,6 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { Trash2 } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -17,6 +21,29 @@ interface AccountSettingsTabProps {
 }
 
 export const AccountSettingsTab = ({ profile, updateProfile }: AccountSettingsTabProps) => {
+  const { signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleDeleteAccount = async () => {
+    try {
+      // Sign out the user first
+      const { error } = await signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Account deletion initiated",
+        description: "Your account has been scheduled for deletion. Please contact support if you need assistance.",
+      });
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again or contact support.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="travel-card">
       <CardHeader className="pb-4 sm:pb-6">
@@ -82,6 +109,49 @@ export const AccountSettingsTab = ({ profile, updateProfile }: AccountSettingsTa
                   updateProfile({ privacy_settings: settings });
                 }}
               />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-4 border-t border-destructive/20">
+          <h3 className="font-medium text-base sm:text-lg text-destructive">Danger Zone</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center justify-between gap-4 p-4 border border-destructive/20 rounded-lg bg-destructive/5">
+              <div className="flex-1">
+                <Label className="text-sm sm:text-base font-medium text-destructive">
+                  Delete Account
+                </Label>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  Permanently delete your account and all associated data. This action cannot be undone.
+                </p>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="shrink-0">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your account
+                      and remove all your data from our servers including your trips, messages,
+                      and profile information.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDeleteAccount}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Yes, delete my account
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>
