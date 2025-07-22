@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderCrew</title>
+    <!-- Start Single Page Apps for GitHub Pages -->
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafrex/spa-github-pages
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <!-- End Single Page Apps for GitHub Pages -->
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9fafb;
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .button:hover {
+            background-color: #1d4ed8;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        // Simple routing function for hash-based navigation
+        function handleRouting() {
+            const hash = window.location.hash;
+            const mainContent = document.getElementById('main-content');
+            const deleteAccountContent = document.getElementById('delete-account-content');
+            
+            if (hash === '#/delete-account') {
+                mainContent.classList.add('hidden');
+                deleteAccountContent.classList.remove('hidden');
+            } else {
+                mainContent.classList.remove('hidden');
+                deleteAccountContent.classList.add('hidden');
+            }
+        }
+        
+        window.addEventListener('load', handleRouting);
+        window.addEventListener('hashchange', handleRouting);
+    </script>
+</head>
+<body>
+    <div id="main-content">
+        <h1>WanderCrew Support Pages</h1>
+        
+        <div class="card">
+            <h2>Account Management</h2>
+            <p>
+                Need to manage your WanderCrew account? You can access our account deletion page below:
+            </p>
+            <p>
+                <a href="#/delete-account" class="button">Delete Account Instructions</a>
+            </p>
+        </div>
+        
+        <div class="card">
+            <h2>Legal</h2>
+            <p>
+                View our legal documents:
+            </p>
+            <ul>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="terms-of-service.html">Terms of Service</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="delete-account-content" class="hidden">
+        <h1>Delete Your WanderCrew Account</h1>
+        
+        <div class="card">
+            <h2>Sign in to delete your account</h2>
+            <p>Please sign in to proceed with account deletion:</p>
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label for="email" style="display: block; margin-bottom: 6px;">Email:</label>
+                    <input type="email" id="email" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label for="password" style="display: block; margin-bottom: 6px;">Password:</label>
+                    <input type="password" id="password" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <button type="button" id="loginButton" class="button" style="width: auto;">Sign In & Delete Account</button>
+                </div>
+            </form>
+            
+            <div id="deleteSuccess" style="display: none; margin-top: 24px;">
+                <div style="background-color: #d1fae5; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px;">
+                    <h3 style="margin-top: 0; color: #065f46;">Account Deletion Successful</h3>
+                    <p>Your account has been successfully deleted. All your data has been removed from our systems.</p>
+                    <p><a href="#" class="button" style="background-color: #10b981;">Return to Home</a></p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 24px;">
+                <a href="#" style="color: #2563eb; text-decoration: none;">&larr; Back to Support</a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Mock login functionality for demonstration
+        document.getElementById('loginButton').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (email && password) {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('deleteSuccess').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
