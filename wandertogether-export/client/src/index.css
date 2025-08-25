@@ -1,0 +1,718 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode - Professional Teal Design System */
+    --background: 0 0% 100%; /* #FFFFFF - clean white */
+    --foreground: 0 0% 10%; /* #1A1A1A - dark charcoal */
+    --card: 180 20% 96%; /* #F3F9F9 - very light teal/grayish tone */
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    
+    /* Primary Brand Teal */
+    --primary: 178 66% 41%; /* #20B2AA - brand teal */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary Sky Blue */
+    --secondary: 198 82% 64%; /* #5BC0EB - sky blue */
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 180 20% 96%;
+    --muted-foreground: 0 0% 29%; /* #4A4A4A - body text */
+    --accent: 180 20% 96%;
+    --accent-foreground: 178 66% 41%;
+    --destructive: 4 75% 57%; /* #E74C3C - error red */
+    --destructive-foreground: 0 0% 100%;
+    --border: 180 20% 90%;
+    --input: 180 20% 94%;
+    --ring: 178 66% 41%;
+    --radius: 0.5rem;
+    
+    /* Professional travel app colors */
+    --brand-teal: 178 66% 41%; /* #20B2AA */
+    --sky-blue: 198 82% 64%; /* #5BC0EB */
+    --success-green: 145 63% 49%; /* #3DBE6C */
+    --warning-orange: 35 85% 55%; /* #F5A623 */
+    --error-red: 4 75% 57%; /* #E74C3C */
+  }
+
+  .dark {
+    /* Dark Mode - Professional Teal Design System */
+    --background: 0 0% 7%; /* #121212 - deep gray/near black */
+    --foreground: 0 0% 100%; /* #FFFFFF - white for clarity */
+    --card: 0 0% 12%; /* #1E1E1E - elevated surfaces */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    
+    /* Primary Brand Teal - maintain consistency */
+    --primary: 178 66% 41%; /* #20B2AA - brand teal */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary Muted Cyan for dark background */
+    --secondary: 177 49% 44%; /* #3AAFA9 - muted cyan */
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 0 0% 17%; /* #2C2C2C - elevated surfaces */
+    --muted-foreground: 0 0% 80%; /* #CCCCCC - muted text */
+    --accent: 0 0% 17%;
+    --accent-foreground: 178 66% 41%;
+    --destructive: 4 75% 57%; /* #E74C3C - error red */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 17%;
+    --ring: 178 66% 41%;
+    
+    /* Professional travel app colors for dark mode */
+    --brand-teal: 178 66% 41%; /* #20B2AA */
+    --sky-blue: 177 49% 44%; /* #3AAFA9 - muted cyan */
+    --success-green: 145 51% 42%; /* #27AE60 */
+    --warning-orange: 32 87% 52%; /* #F39C12 */
+    --error-red: 4 75% 57%; /* #E74C3C */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    transition: 
+      color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-weight: 500; /* Medium weight for better readability */
+    transition: 
+      background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced mobile typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700; /* Bold headings */
+    letter-spacing: -0.025em;
+  }
+
+  h1 { font-size: 2.25rem; font-weight: 800; } /* Extra bold for main headings */
+  h2 { font-size: 1.875rem; font-weight: 700; }
+  h3 { font-size: 1.5rem; font-weight: 700; }
+  h4 { font-size: 1.25rem; font-weight: 600; }
+  h5 { font-size: 1.125rem; font-weight: 600; }
+  h6 { font-size: 1rem; font-weight: 600; }
+
+  p, div, span {
+    font-weight: 500; /* Medium weight for body text */
+  }
+
+  button, .button {
+    font-weight: 600; /* Semibold for buttons */
+    letter-spacing: 0.025em;
+  }
+
+  label {
+    font-weight: 600; /* Semibold for labels */
+  }
+
+  input, textarea, select {
+    font-weight: 500; /* Medium weight for inputs */
+  }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px; /* Base font size for mobile */
+      font-weight: 500;
+      line-height: 1.6;
+      padding-top: 70px; /* Account for fixed navbar */
+    }
+
+    h1 { font-size: 2rem; font-weight: 800; }
+    h2 { font-size: 1.75rem; font-weight: 700; }
+    h3 { font-size: 1.375rem; font-weight: 700; }
+    h4 { font-size: 1.125rem; font-weight: 600; }
+
+    button, .button {
+      font-size: 1rem;
+      font-weight: 600;
+      min-height: 44px; /* Touch-friendly button height */
+    }
+
+    .text-sm {
+      font-size: 0.925rem; /* Slightly larger small text on mobile */
+      font-weight: 500;
+    }
+
+    .text-xs {
+      font-size: 0.825rem; /* Readable extra small text */
+      font-weight: 500;
+    }
+
+    /* Ensure proper contrast on mobile */
+    .bg-gradient-sky {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #F1F5F9 100%);
+    }
+
+    .dark .bg-gradient-sky {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+    }
+
+    /* Mobile container adjustments */
+    .container {
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
+    }
+
+    /* Mobile spacing fixes */
+    .mobile-safe-padding {
+      padding: 1rem;
+    }
+  }
+}
+
+/* Professional teal gradients */
+.bg-gradient-sky {
+  background: linear-gradient(135deg, #20B2AA 0%, #5BC0EB 50%, #3DBE6C 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease-in-out infinite;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(135deg, #20B2AA 0%, #5BC0EB 25%, #3DBE6C 50%, #F5A623 75%, #20B2AA 100%);
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease-in-out infinite;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #20B2AA 0%, #5BC0EB 30%, #3DBE6C 60%, #F5A623 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800; /* Extra bold for gradient text */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: gradient-shift 5s ease-in-out infinite;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Professional travel app utility classes */
+.bg-brand-teal { 
+  background-color: hsl(var(--brand-teal)); 
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-sky-blue { 
+  background-color: hsl(var(--sky-blue)); 
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-success-green { 
+  background-color: hsl(var(--success-green)); 
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-warning-orange { 
+  background-color: hsl(var(--warning-orange)); 
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-error-red { 
+  background-color: hsl(var(--error-red)); 
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.text-brand-teal { 
+  color: hsl(var(--brand-teal)); 
+  font-weight: 600;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.text-sky-blue { 
+  color: hsl(var(--sky-blue)); 
+  font-weight: 600;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.text-success-green { 
+  color: hsl(var(--success-green)); 
+  font-weight: 600;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.text-warning-orange { 
+  color: hsl(var(--warning-orange)); 
+  font-weight: 600;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.text-error-red { 
+  color: hsl(var(--error-red)); 
+  font-weight: 600;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced mobile typography utility classes */
+.mobile-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.mobile-subtitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.mobile-body {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.mobile-caption {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.mobile-button-text {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+@media (max-width: 768px) {
+  .mobile-title { font-size: 1.375rem; }
+  .mobile-subtitle { font-size: 1.125rem; }
+  .mobile-body { font-size: 1rem; }
+  .mobile-caption { font-size: 0.925rem; }
+}
+
+/* Bold text utilities for enhanced mobile visibility */
+.font-bold-mobile {
+  font-weight: 600;
+}
+
+.font-extra-bold-mobile {
+  font-weight: 700;
+}
+
+.font-black-mobile {
+  font-weight: 800;
+}
+
+@media (max-width: 768px) {
+  .font-bold-mobile { font-weight: 700; }
+  .font-extra-bold-mobile { font-weight: 800; }
+  .font-black-mobile { font-weight: 900; }
+}
+
+/* Professional travel card styling */
+.travel-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(243, 249, 249, 0.99) 100%);
+  backdrop-filter: blur(16px);
+  border: 2px solid rgba(32, 178, 170, 0.25);
+  box-shadow: 0 10px 40px rgba(32, 178, 170, 0.12), 0 6px 20px rgba(91, 192, 235, 0.08);
+  transition: 
+    all 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: card-entrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes card-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.travel-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(32, 178, 170, 0.25), 0 15px 30px rgba(91, 192, 235, 0.18);
+  border-color: rgba(91, 192, 235, 0.6);
+}
+
+/* Custom travel card styling */
+.travel-card {
+  @apply backdrop-blur-md border border-white/20 bg-white/10 shadow-xl;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.travel-card:hover {
+  @apply transform -translate-y-1 transition-all duration-300;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+/* Elevated shadow effects */
+.shadow-elevated {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile-optimized touch targets */
+.touch-target {
+  @apply min-h-[44px] min-w-[44px];
+}
+
+/* Mobile-safe area insets for iOS devices */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-area-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Mobile input optimization */
+input, select, textarea {
+  @apply text-base leading-6;
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Loading animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Mobile-first responsive utilities */
+.mobile-card {
+  @apply rounded-t-xl sm:rounded-xl;
+}
+
+.mobile-modal {
+  @apply h-screen sm:h-auto sm:max-h-[90vh];
+}
+
+.mobile-nav {
+  @apply sticky top-0 z-50 backdrop-blur-md;
+}
+
+.mobile-title {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+.mobile-body {
+  @apply text-sm sm:text-base;
+}
+
+.mobile-padding {
+  @apply p-4 sm:p-6;
+}
+
+.mobile-spacing {
+  @apply space-y-4 sm:space-y-6;
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  .travel-card {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .travel-card:hover {
+    background: rgba(15, 23, 42, 0.98);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .travel-card {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Theme transition for smooth dark/light mode switching */
+.theme-transition,
+.theme-transition *,
+.theme-transition *:before,
+.theme-transition *:after {
+  transition: 
+    background-color 300ms ease-in-out,
+    border-color 300ms ease-in-out,
+    color 300ms ease-in-out,
+    fill 300ms ease-in-out,
+    stroke 300ms ease-in-out,
+    box-shadow 300ms ease-in-out !important;
+}
+
+/* Enhanced dark mode styles */
+.dark {
+  color-scheme: dark;
+}
+
+.dark .bg-gradient-sky {
+  background: linear-gradient(135deg, #20B2AA 0%, #3AAFA9 50%, #27AE60 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease-in-out infinite;
+}
+
+.dark .bg-gradient-hero {
+  background: linear-gradient(135deg, #20B2AA 0%, #3AAFA9 25%, #27AE60 50%, #F39C12 75%, #20B2AA 100%);
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+.dark .gradient-text {
+  background: linear-gradient(135deg, #20B2AA 0%, #3AAFA9 30%, #27AE60 60%, #F39C12 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+  animation: gradient-shift 5s ease-in-out infinite;
+}
+
+/* Dark mode travel cards */
+.dark .travel-card {
+  background: linear-gradient(135deg, rgba(18, 18, 18, 0.98) 0%, rgba(30, 30, 30, 0.99) 100%);
+  border: 2px solid rgba(32, 178, 170, 0.4);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(32, 178, 170, 0.15);
+}
+
+.dark .travel-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 15px 30px rgba(32, 178, 170, 0.25);
+  border-color: rgba(58, 175, 169, 0.7);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Theme toggle animations */
+@keyframes theme-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.theme-toggle-bounce {
+  animation: theme-bounce 0.3s ease-in-out;
+}
+
+/* Smooth focus transitions for accessibility */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  transition: outline-offset 150ms ease-in-out;
+}
+
+/* Enhanced button transitions */
+button, .button {
+  transition: 
+    background-color 200ms ease-in-out,
+    border-color 200ms ease-in-out,
+    color 200ms ease-in-out,
+    box-shadow 200ms ease-in-out,
+    transform 150ms ease-in-out;
+}
+
+button:hover, .button:hover {
+  transform: translateY(-1px);
+}
+
+button:active, .button:active {
+  transform: translateY(0);
+}
+
+/* Card hover effects with theme awareness */
+.card-hover {
+  transition: 
+    transform 200ms ease-in-out,
+    box-shadow 200ms ease-in-out,
+    background-color 200ms ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Advanced Animation Effects */
+
+/* Button hover animations with color pulses */
+.btn-animated {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.btn-animated:hover::before {
+  left: 100%;
+}
+
+/* Color pulse animations */
+@keyframes color-pulse-ocean {
+  0%, 100% {
+    background-color: hsl(217.2, 91.2%, 50%);
+    box-shadow: 0 0 20px hsla(217.2, 91.2%, 50%, 0.3);
+  }
+  50% {
+    background-color: hsl(217.2, 91.2%, 55%);
+    box-shadow: 0 0 30px hsla(217.2, 91.2%, 50%, 0.5);
+  }
+}
+
+@keyframes color-pulse-tropical {
+  0%, 100% {
+    background-color: hsl(188.7, 85.3%, 35%);
+    box-shadow: 0 0 20px hsla(188.7, 85.3%, 35%, 0.3);
+  }
+  50% {
+    background-color: hsl(188.7, 85.3%, 40%);
+    box-shadow: 0 0 30px hsla(188.7, 85.3%, 35%, 0.5);
+  }
+}
+
+@keyframes color-pulse-adventure {
+  0%, 100% {
+    background-color: hsl(142.1, 76.2%, 30%);
+    box-shadow: 0 0 20px hsla(142.1, 76.2%, 30%, 0.3);
+  }
+  50% {
+    background-color: hsl(142.1, 76.2%, 35%);
+    box-shadow: 0 0 30px hsla(142.1, 76.2%, 30%, 0.5);
+  }
+}
+
+/* Animated utility classes */
+.animate-pulse-ocean {
+  animation: color-pulse-ocean 2s ease-in-out infinite;
+}
+
+.animate-pulse-tropical {
+  animation: color-pulse-tropical 2s ease-in-out infinite;
+}
+
+.animate-pulse-adventure {
+  animation: color-pulse-adventure 2s ease-in-out infinite;
+}
+
+/* Floating animation for special elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Interactive glow effects */
+.glow-on-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glow-on-hover:hover {
+  filter: drop-shadow(0 0 20px currentColor);
+  transform: scale(1.05);
+}
+
+/* Enhanced mobile and accessibility */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *:before,
+  .theme-transition *:after,
+  .travel-card,
+  .animate-float,
+  button,
+  .button,
+  .card-hover,
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
