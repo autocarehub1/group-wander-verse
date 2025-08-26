@@ -1,0 +1,60 @@
+# This file specifies files that are *not* uploaded to Google Cloud Platform
+# using gcloud. It follows the same syntax as .gitignore, with the addition of
+# "#!include" directives (which insert the entries of the given .gitignore-style
+# file at that point).
+
+#!include:.gitignore
+
+# Node.js dependencies
+node_modules/
+
+# Development files
+.env.local
+.env.development
+*.log
+*.tmp
+
+# Source files (since we deploy built version)
+client/
+server/*.ts
+shared/*.ts
+!server/vite.ts
+!dist/
+
+# Development tools
+.vscode/
+.idea/
+*.md
+README.md
+
+# Testing
+test/
+tests/
+spec/
+coverage/
+.nyc_output/
+
+# Git
+.git/
+.gitignore
+
+# Build artifacts not needed
+*.tsbuildinfo
+tsconfig.json
+vite.config.ts
+tailwind.config.ts
+postcss.config.js
+drizzle.config.ts
+
+# Mobile development
+android/
+capacitor.config.ts
+
+# Replit specific
+.replit
+uploads/
+supabase/
+
+# OS files
+.DS_Store
+Thumbs.db
