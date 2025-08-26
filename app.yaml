@@ -27,7 +27,7 @@ steps:
         npm install --verbose --production=false 2>&1 | tee install.log
         
         # Check install success
-        if [ $? -ne 0 ]; then
+        if [ $$? -ne 0 ]; then
           echo "ERROR: npm install failed"
           echo "Install log tail:"
           tail -20 install.log
@@ -40,10 +40,10 @@ steps:
         # Try builds with full error capture
         echo "=== Building Client ==="
         npx vite build --mode production 2>&1 | tee vite.log
-        VITE_EXIT=$?
+        VITE_STATUS=$$?
         
-        if [ $VITE_EXIT -ne 0 ]; then
-          echo "ERROR: Vite build failed (exit code: $VITE_EXIT)"
+        if [ $$VITE_STATUS -ne 0 ]; then
+          echo "ERROR: Vite build failed (exit code: $$VITE_STATUS)"
           echo "Vite log:"
           cat vite.log
           exit 1
@@ -51,10 +51,10 @@ steps:
         
         echo "=== Building Server ==="
         npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist 2>&1 | tee esbuild.log
-        ESBUILD_EXIT=$?
+        ESBUILD_STATUS=$$?
         
-        if [ $ESBUILD_EXIT -ne 0 ]; then
-          echo "ERROR: ESBuild failed (exit code: $ESBUILD_EXIT)"
+        if [ $$ESBUILD_STATUS -ne 0 ]; then
+          echo "ERROR: ESBuild failed (exit code: $$ESBUILD_STATUS)"
           echo "ESBuild log:"
           cat esbuild.log
           exit 1
