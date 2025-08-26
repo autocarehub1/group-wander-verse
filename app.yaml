@@ -9,11 +9,19 @@ steps:
         echo "=== Node.js App Engine Build ==="
         echo "Node: $(node --version) | NPM: $(npm --version)"
         
-        # Clean install with cache optimization
-        npm ci --cache /tmp/.npm --prefer-offline
+        # Install all dependencies including devDependencies
+        npm install --cache /tmp/.npm --production=false
         
-        # Build with error handling
-        npm run build || exit 1
+        # Debug: Check if build tools exist
+        echo "Checking build tools..."
+        npx vite --version || echo "Vite not found"
+        npx esbuild --version || echo "ESBuild not found"
+        
+        # Build with explicit tool paths
+        echo "Building client..."
+        npx vite build --mode production || exit 1
+        echo "Building server..."
+        npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist || exit 1
         
         # Verify build outputs
         test -f dist/index.js || (echo "Server build missing" && exit 1)
