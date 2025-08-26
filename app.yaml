@@ -1,8 +1,1 @@
 runtime: nodejs20
-
-env:
-  NODE_ENV: production
-
-automatic_scaling:
-  min_instances: 1
-  max_instances: 10
