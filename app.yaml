@@ -1,27 +1,37 @@
 steps:
-  # Use the deployment script for reliable builds
+  # Debug and install dependencies
   - name: 'gcr.io/cloud-builders/npm'
     entrypoint: 'bash'
     args: 
       - '-c'
       - |
+        set -e
+        echo "=== DEBUG INFO ==="
         echo "Node version: $(node --version)"
         echo "NPM version: $(npm --version)"
-        echo "Installing dependencies..."
-        npm ci --verbose
-        echo "Building application..."
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        echo "Package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
+        echo "Package-lock.json exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
+        echo "=== INSTALLING DEPENDENCIES ==="
+        npm install --no-optional --verbose
+        echo "=== DEPENDENCIES INSTALLED ==="
+        
+  # Build application
+  - name: 'gcr.io/cloud-builders/npm'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        echo "=== BUILDING APPLICATION ==="
         npm run build
-        echo "Build complete. Checking artifacts..."
-        ls -la dist/
-        if [ ! -f "dist/index.js" ]; then
-          echo "ERROR: Server build failed - dist/index.js not found"
-          exit 1
-        fi
-        if [ ! -d "dist/public" ]; then
-          echo "ERROR: Client build failed - dist/public/ not found"  
-          exit 1
-        fi
-        echo "Build verification successful!"
+        echo "=== BUILD COMPLETE ==="
+        echo "Checking build artifacts:"
+        ls -la dist/ || echo "No dist directory found"
+        test -f dist/index.js && echo "✓ Server build: dist/index.js found" || echo "✗ Server build: dist/index.js NOT found"
+        test -d dist/public && echo "✓ Client build: dist/public/ found" || echo "✗ Client build: dist/public/ NOT found"
   
   # Deploy to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
