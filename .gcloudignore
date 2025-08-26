@@ -5,8 +5,8 @@
 
 #!include:.gitignore
 
-# Node.js dependencies
-node_modules/
+# Node.js dependencies - keep for local, exclude for cloud build
+# node_modules/ (commented out - Cloud Build needs to install these)
 
 # Development files
 .env.local
@@ -14,12 +14,11 @@ node_modules/
 *.log
 *.tmp
 
-# Source files (since we deploy built version)
-client/
-server/*.ts
-shared/*.ts
-!server/vite.ts
-!dist/
+# Source files needed for Cloud Build
+# client/
+# server/*.ts  
+# shared/*.ts
+# (commented out - Cloud Build needs these to build)
 
 # Development tools
 .vscode/
