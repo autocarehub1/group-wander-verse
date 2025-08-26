@@ -1,55 +1,25 @@
 steps:
-  # Debug and install dependencies
-  - name: 'gcr.io/cloud-builders/npm'
+  # Single step: install, build, and verify
+  - name: 'node:20'
     entrypoint: 'bash'
     args: 
       - '-c'
       - |
-        set -e
-        echo "=== DEBUG INFO ==="
-        echo "Node version: $(node --version)"
-        echo "NPM version: $(npm --version)"
-        echo "Current directory: $(pwd)"
-        echo "Directory contents:"
-        ls -la
-        echo "Package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
-        echo "Package-lock.json exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
-        echo "=== USING MINIMAL PACKAGE CONFIG ==="
-        cp package.gcp.json package.json.backup
-        cp package.gcp.json package.json
-        echo "=== INSTALLING DEPENDENCIES ==="
-        npm install --no-optional --production=false
-        echo "=== DEPENDENCIES INSTALLED ==="
+        # Install and build in single step to avoid state issues
+        echo "=== Node.js App Engine Build ==="
+        echo "Node: $(node --version) | NPM: $(npm --version)"
         
-  # Build application with enhanced error handling
-  - name: 'gcr.io/cloud-builders/npm'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        set -e
-        echo "=== BUILDING APPLICATION ==="
-        echo "Build script: $(npm run build --silent 2>&1 || echo 'Build script check failed')"
-        echo "Running Vite build..."
-        npx vite build --mode production || (echo "Vite build failed" && exit 1)
-        echo "Running server build..."
-        npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist || (echo "Server build failed" && exit 1)
-        echo "=== BUILD COMPLETE ==="
-        echo "Checking build artifacts:"
-        ls -la dist/ 2>/dev/null || echo "No dist directory found"
-        if [ -f "dist/index.js" ]; then
-          echo "✓ Server build: dist/index.js found ($(du -h dist/index.js | cut -f1))"
-        else
-          echo "✗ Server build: dist/index.js NOT found"
-          exit 1
-        fi
-        if [ -d "dist/public" ]; then
-          echo "✓ Client build: dist/public/ found"
-          ls -la dist/public/ | head -5
-        else
-          echo "✗ Client build: dist/public/ NOT found"
-          exit 1
-        fi
+        # Clean install with cache optimization
+        npm ci --cache /tmp/.npm --prefer-offline
+        
+        # Build with error handling
+        npm run build || exit 1
+        
+        # Verify build outputs
+        test -f dist/index.js || (echo "Server build missing" && exit 1)
+        test -d dist/public || (echo "Client build missing" && exit 1)
+        
+        echo "✅ Build successful - ready for deployment"
   
   # Deploy to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
