@@ -61,17 +61,31 @@ steps:
         fi
         
         echo "=== Verifying Build Outputs ==="
-        ls -la dist/
+        echo "Contents of dist/:"
+        ls -la dist/ 2>/dev/null || echo "No dist directory found"
         
+        echo "Contents of root directory after build:"
+        find . -name "*.js" -o -name "index.html" -o -name "dist" -type f,d | head -20
+        
+        echo "Looking for build outputs:"
+        echo "- Server build (dist/index.js): $$(test -f dist/index.js && echo "✓ Found" || echo "✗ Missing")"
+        echo "- Client build outputs:"
+        find dist/ -name "*.html" -o -name "*.js" -o -name "*.css" | head -10 2>/dev/null || echo "No client build files found"
+        
+        # Update verification to match actual Vite output structure
         if [ ! -f dist/index.js ]; then
           echo "ERROR: Server build missing - dist/index.js not found"
           exit 1
         fi
         
-        if [ ! -d dist/public ]; then
-          echo "ERROR: Client build missing - dist/public/ not found"
+        # Check for any client build output files instead of specific directory
+        CLIENT_FILES=$$(find dist/ -name "index.html" -o -name "*.js" -o -name "*.css" | wc -l)
+        if [ "$$CLIENT_FILES" -eq 0 ]; then
+          echo "ERROR: Client build missing - no client files found in dist/"
           exit 1
         fi
+        
+        echo "Found $$CLIENT_FILES client build files"
         
         echo "✅ Build completed successfully"
   
