@@ -22,9 +22,11 @@ steps:
         echo "Package.json content (first 20 lines):"
         head -20 package.json
         
-        # Install with verbose output to see what's happening
-        echo "=== Installing Dependencies ==="
-        npm install --verbose --production=false 2>&1 | tee install.log
+        # Clean install to fix optional dependency issues
+        echo "=== Cleaning and Installing Dependencies ==="
+        rm -rf node_modules package-lock.json || true
+        npm cache clean --force || true
+        npm install --production=false --no-optional 2>&1 | tee install.log
         
         # Check install success
         if [ $$? -ne 0 ]; then
@@ -36,6 +38,10 @@ steps:
         
         echo "=== Checking Node Modules ==="
         ls -la node_modules/.bin/ | head -10
+        
+        # Force install rollup native binary if missing
+        echo "=== Checking Rollup Dependencies ==="
+        npm list @rollup/rollup-linux-x64-gnu || npm install @rollup/rollup-linux-x64-gnu --no-save || true
         
         # Try builds with full error capture
         echo "=== Building Client ==="
