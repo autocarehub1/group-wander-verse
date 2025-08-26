@@ -1,0 +1,73 @@
+runtime: nodejs20
+
+# Environment variables for production
+env_variables:
+  NODE_ENV: production
+
+# Basic scaling configuration
+basic_scaling:
+  max_instances: 10
+  idle_timeout: 10m
+
+# Resource configuration
+resources:
+  cpu: 1
+  memory_gb: 1
+  disk_size_gb: 10
+
+# Network configuration
+network:
+  name: default
+
+# Health checks
+readiness_check:
+  path: "/"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+  app_start_timeout_sec: 300
+
+liveness_check:
+  path: "/"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 4
+  success_threshold: 2
+
+# Skip files that shouldn't be uploaded
+skip_files:
+- ^(.*/)?\..*$
+- ^(.*/)?.*\.md$
+- ^(.*/)?node_modules$
+- ^(.*/)?README\..*$
+- ^(.*/)?\.gitignore$
+- ^(.*/)?\.git/.*$
+- ^(.*/)?test/.*$
+- ^(.*/)?tests/.*$
+- ^(.*/)?spec/.*$
+- ^(.*/)?coverage/.*$
+- ^(.*/)?\.nyc_output/.*$
+- ^(.*/)?docs/.*$
+- ^(.*/)?\.vscode/.*$
+- ^(.*/)?\.idea/.*$
+- ^(.*/)?\.DS_Store$
+- ^(.*/)?Thumbs\.db$
+- ^(.*/)?\.env\.local$
+- ^(.*/)?\.env\.development$
+- ^(.*/)?src/.*$
+- ^(.*/)?client/.*$
+- ^(.*/)?server/.*\.ts$
+- ^(.*/)?shared/.*\.ts$
+- ^(.*/)?vite\.config\.ts$
+- ^(.*/)?tailwind\.config\.ts$
+- ^(.*/)?tsconfig\.json$
+- ^(.*/)?postcss\.config\.js$
+- ^(.*/)?drizzle\.config\.ts$
+- ^(.*/)?capacitor\.config\.ts$
+- ^(.*/)?components\.json$
+- ^(.*/)?android/.*$
+- ^(.*/)?supabase/.*$
+- ^(.*/)?uploads/.*$
+- ^(.*/)?attached_assets/.*$
+- ^(.*/)?\.replit$
