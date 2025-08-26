@@ -1,23 +1,16 @@
-runtime: nodejs20
+steps:
+  # Install dependencies
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+    
+  # Build the application
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+    
+  # Deploy to App Engine
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy', 'app.engine.yaml', '--quiet']
 
-env_variables:
-  NODE_ENV: production
-
-automatic_scaling:
-  min_instances: 1
-  max_instances: 10
-
-readiness_check:
-  path: "/health"
-  check_interval_sec: 5
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
-  app_start_timeout_sec: 300
-
-liveness_check:
-  path: "/health"
-  check_interval_sec: 30
-  timeout_sec: 4
-  failure_threshold: 4
-  success_threshold: 2
+timeout: '1600s'
+options:
+  logging: CLOUD_LOGGING_ONLY
