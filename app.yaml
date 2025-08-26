@@ -14,11 +14,14 @@ steps:
         ls -la
         echo "Package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
         echo "Package-lock.json exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
+        echo "=== USING MINIMAL PACKAGE CONFIG ==="
+        cp package.gcp.json package.json.backup
+        cp package.gcp.json package.json
         echo "=== INSTALLING DEPENDENCIES ==="
-        npm install --no-optional --verbose
+        npm install --no-optional --production=false
         echo "=== DEPENDENCIES INSTALLED ==="
         
-  # Build application
+  # Build application with enhanced error handling
   - name: 'gcr.io/cloud-builders/npm'
     entrypoint: 'bash'
     args:
@@ -26,12 +29,27 @@ steps:
       - |
         set -e
         echo "=== BUILDING APPLICATION ==="
-        npm run build
+        echo "Build script: $(npm run build --silent 2>&1 || echo 'Build script check failed')"
+        echo "Running Vite build..."
+        npx vite build --mode production || (echo "Vite build failed" && exit 1)
+        echo "Running server build..."
+        npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist || (echo "Server build failed" && exit 1)
         echo "=== BUILD COMPLETE ==="
         echo "Checking build artifacts:"
-        ls -la dist/ || echo "No dist directory found"
-        test -f dist/index.js && echo "✓ Server build: dist/index.js found" || echo "✗ Server build: dist/index.js NOT found"
-        test -d dist/public && echo "✓ Client build: dist/public/ found" || echo "✗ Client build: dist/public/ NOT found"
+        ls -la dist/ 2>/dev/null || echo "No dist directory found"
+        if [ -f "dist/index.js" ]; then
+          echo "✓ Server build: dist/index.js found ($(du -h dist/index.js | cut -f1))"
+        else
+          echo "✗ Server build: dist/index.js NOT found"
+          exit 1
+        fi
+        if [ -d "dist/public" ]; then
+          echo "✓ Client build: dist/public/ found"
+          ls -la dist/public/ | head -5
+        else
+          echo "✗ Client build: dist/public/ NOT found"
+          exit 1
+        fi
   
   # Deploy to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
