@@ -1,8 +1,19 @@
 runtime: nodejs20
 
+# Skip automatic npm build - we handle this in Cloud Build
+env_variables:
+  NODE_ENV: "production"
+  GOOGLE_NODE_RUN_SCRIPTS: ""
+
 automatic_scaling:
   min_instances: 0
   max_instances: 5
 
-env_variables:
-  NODE_ENV: "production"
+# Explicitly skip build scripts
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- ^(.*/)?.*\.bak$

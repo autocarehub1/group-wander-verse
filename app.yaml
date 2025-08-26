@@ -39,9 +39,9 @@ steps:
         echo "=== Checking Node Modules ==="
         ls -la node_modules/.bin/ | head -10
         
-        # Force install rollup native binary if missing
-        echo "=== Checking Rollup Dependencies ==="
-        npm list @rollup/rollup-linux-x64-gnu || npm install @rollup/rollup-linux-x64-gnu --no-save || true
+        # Force install all rollup platform binaries to avoid missing dependencies
+        echo "=== Installing Rollup Binaries ==="
+        npm install @rollup/rollup-linux-x64-gnu @rollup/rollup-linux-arm64-gnu @rollup/rollup-linux-x64-musl --no-save || true
         
         # Try builds with full error capture
         echo "=== Building Client ==="
@@ -92,6 +92,11 @@ steps:
         fi
         
         echo "Found $$CLIENT_FILES client build files"
+        
+        # Create minimal production package.json to avoid build issues in App Engine
+        echo "=== Creating Production Configuration ==="
+        cp package.prod.json package.json
+        rm -f package-lock.json
         
         echo "✅ Build completed successfully"
   
