@@ -1,59 +1,50 @@
-# This file specifies files that are *not* uploaded to Google Cloud Platform
-# using gcloud. It follows the same syntax as .gitignore, with the addition of
-# "#!include" directives (which insert the entries of the given .gitignore-style
-# file at that point).
+# Build artifacts - these will be recreated
+node_modules/
+dist/
 
-#!include:.gitignore
-
-# Node.js dependencies - keep for local, exclude for cloud build
-# node_modules/ (commented out - Cloud Build needs to install these)
-
-# Development files
+# Development and config files not needed in production
 .env.local
 .env.development
+.vscode/
+.idea/
 *.log
 *.tmp
 
-# Source files needed for Cloud Build
-# client/
-# server/*.ts  
-# shared/*.ts
-# (commented out - Cloud Build needs these to build)
-
-# Development tools
-.vscode/
-.idea/
-*.md
+# Documentation and non-essential files
 README.md
+*.md
+!replit.md
 
-# Testing
+# Git files
+.git/
+.gitignore
+
+# Test files
 test/
 tests/
 spec/
 coverage/
 .nyc_output/
 
-# Git
-.git/
-.gitignore
-
-# Build artifacts not needed
-*.tsbuildinfo
-tsconfig.json
-vite.config.ts
-tailwind.config.ts
-postcss.config.js
-drizzle.config.ts
-
-# Mobile development
-android/
-capacitor.config.ts
+# OS files
+.DS_Store
+Thumbs.db
 
 # Replit specific
 .replit
 uploads/
-supabase/
 
-# OS files
-.DS_Store
-Thumbs.db
+# Mobile development (not needed for web deployment)
+android/
+capacitor.config.ts
+
+# These files ARE needed and will be included:
+# package.json
+# package-lock.json  
+# client/
+# server/
+# shared/
+# vite.config.ts
+# tsconfig.json
+# tailwind.config.ts
+# postcss.config.js
