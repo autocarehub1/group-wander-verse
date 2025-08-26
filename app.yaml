@@ -1,11 +1,21 @@
 steps:
-  # Install dependencies
+  # Set up Node.js environment
   - name: 'gcr.io/cloud-builders/npm'
-    args: ['ci']
+    args: ['--version']
+    
+  # Install dependencies with verbose output for debugging
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install', '--verbose']
+    env:
+    - 'NPM_CONFIG_LOGLEVEL=verbose'
     
   # Build the application
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
+    
+  # List build output for verification
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['--version']
     
   # Deploy to App Engine
   - name: 'gcr.io/cloud-builders/gcloud'
