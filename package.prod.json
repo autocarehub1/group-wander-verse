@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "build": "tsc",
     "start": "NODE_ENV=production node dist/index.js"
   },
   "engines": {
