@@ -8,12 +8,3 @@ env_variables:
 automatic_scaling:
   min_instances: 0
   max_instances: 5
-
-# Explicitly skip build scripts
-skip_files:
-- ^(.*/)?#.*#$
-- ^(.*/)?.*~$
-- ^(.*/)?.*\.py[co]$
-- ^(.*/)?.*/RCS/.*$
-- ^(.*/)?\..*$
-- ^(.*/)?.*\.bak$
