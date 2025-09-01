@@ -1,0 +1,52 @@
+# Multi-stage build for frontend
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --production=false --no-optional
+
+# Copy source code
+COPY . .
+
+# Build frontend only
+RUN npx vite build
+
+# Production nginx stage
+FROM nginx:1.25-alpine AS production
+
+# Create non-root user
+RUN addgroup -g 101 -S nginx
+
+# Copy nginx configuration
+COPY kubernetes/nginx-config.yaml /tmp/nginx-config.yaml
+
+# Extract nginx config from ConfigMap format to actual config
+RUN apk add --no-cache yq && \
+    yq eval '.data."nginx.conf"' /tmp/nginx-config.yaml > /etc/nginx/nginx.conf && \
+    rm /tmp/nginx-config.yaml && \
+    apk del yq
+
+# Copy built frontend assets
+COPY --from=builder /app/dist/public /usr/share/nginx/html
+
+# Create necessary directories and set permissions
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
+    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+
+# Switch to non-root user
+USER nginx
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

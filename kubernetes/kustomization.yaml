@@ -1,0 +1,50 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: wandertogether
+
+resources:
+- namespace.yaml
+- configmap.yaml
+- secret.yaml
+- nginx-config.yaml
+- deployment.yaml
+- frontend-deployment.yaml
+- ingress.yaml
+- hpa.yaml
+- network-policy.yaml
+
+images:
+- name: wandertogether-backend
+  newName: gcr.io/PROJECT_ID/wandertogether-backend
+  newTag: latest
+- name: wandertogether-frontend
+  newName: gcr.io/PROJECT_ID/wandertogether-frontend
+  newTag: latest
+
+replicas:
+- name: wandertogether-backend
+  count: 3
+- name: wandertogether-frontend
+  count: 2
+
+patchesStrategicMerge:
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: wandertogether-backend
+    namespace: wandertogether
+  spec:
+    template:
+      metadata:
+        labels:
+          version: v1
+          
+commonLabels:
+  app.kubernetes.io/name: wandertogether
+  app.kubernetes.io/instance: wandertogether-prod
+  app.kubernetes.io/version: v1.0.0
+  app.kubernetes.io/component: travel-app
+  app.kubernetes.io/part-of: wandertogether-platform
+  app.kubernetes.io/managed-by: kustomize

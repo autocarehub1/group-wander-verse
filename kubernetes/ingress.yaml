@@ -1,0 +1,68 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wandertogether-ingress
+  namespace: wandertogether
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "wandertogether-ip"
+    ingress.gcp.kubernetes.io/managed-certificates: "wandertogether-ssl-cert"
+    kubernetes.io/ingress.allow-http: "false"
+    # Enable Cloud CDN for static assets
+    cloud.google.com/backend-config: '{"default": "wandertogether-backendconfig"}'
+spec:
+  rules:
+  - host: wandertogether.example.com
+    http:
+      paths:
+      - path: /api/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: wandertogether-backend
+            port:
+              number: 80
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: wandertogether-frontend
+            port:
+              number: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: wandertogether-ssl-cert
+  namespace: wandertogether
+spec:
+  domains:
+    - wandertogether.example.com
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: wandertogether-backendconfig
+  namespace: wandertogether
+spec:
+  healthCheck:
+    checkIntervalSec: 10
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+    type: HTTP
+    requestPath: /health
+  connectionDraining:
+    drainingTimeoutSec: 60
+  cdn:
+    enabled: true
+    cachePolicy:
+      includeHost: true
+      includeProtocol: true
+      includeQueryString: false
+    negativeCaching: true
+    negativeCachingPolicy:
+    - code: 404
+      ttl: 120
+    - code: 410
+      ttl: 120

@@ -1,0 +1,68 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+
+metadata:
+  name: wandertogether
+
+build:
+  artifacts:
+  - image: wandertogether-backend
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: "server/**/*.ts"
+        dest: /app/server
+      - src: "shared/**/*.ts" 
+        dest: /app/shared
+  - image: wandertogether-frontend
+    docker:
+      dockerfile: Dockerfile.frontend
+    sync:
+      manual:
+      - src: "client/**/*"
+        dest: /app/client
+
+deploy:
+  kustomize:
+    paths:
+    - kubernetes/
+
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - image: wandertogether-backend
+      docker:
+        dockerfile: Dockerfile
+        target: builder
+    local:
+      push: false
+  deploy:
+    kustomize:
+      paths:
+      - kubernetes/
+  portForward:
+  - resourceType: service
+    resourceName: wandertogether-backend
+    port: 80
+    localPort: 5000
+  - resourceType: service
+    resourceName: wandertogether-frontend
+    port: 80
+    localPort: 3000
+
+- name: production
+  build:
+    googleCloudBuild:
+      projectId: PROJECT_ID
+  deploy:
+    kustomize:
+      paths:
+      - kubernetes/
+    kubectl:
+      flags:
+        apply:
+        - --validate=true
+        - --wait=true
+        - --timeout=300s

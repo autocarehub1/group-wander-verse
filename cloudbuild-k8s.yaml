@@ -1,0 +1,111 @@
+steps:
+# Build backend image
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+  - 'build'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wandertogether-backend:$COMMIT_SHA'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wandertogether-backend:latest'
+  - '.'
+  id: 'build-backend'
+
+# Build frontend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.frontend'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wandertogether-frontend:latest'
+  - '.'
+  id: 'build-frontend'
+
+# Push backend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/wandertogether-backend:$COMMIT_SHA'
+  id: 'push-backend'
+  waitFor: ['build-backend']
+
+# Push frontend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA'
+  id: 'push-frontend'
+  waitFor: ['build-frontend']
+
+# Deploy to Kubernetes using kustomize
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  args:
+  - run
+  - --filename=kubernetes/
+  - --image=gcr.io/$PROJECT_ID/wandertogether-backend:$COMMIT_SHA
+  - --image=gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA
+  - --location=${_GKE_REGION}
+  - --cluster=${_GKE_CLUSTER}
+  - --namespace=wandertogether
+  id: 'deploy-to-gke'
+  waitFor: ['push-backend', 'push-frontend']
+
+# Verify deployment
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'rollout'
+  - 'status'
+  - 'deployment/wandertogether-backend'
+  - '-n'
+  - 'wandertogether'
+  env:
+  - 'CLOUDSDK_COMPUTE_REGION=${_GKE_REGION}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
+  id: 'verify-backend-deployment'
+  waitFor: ['deploy-to-gke']
+
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'rollout'
+  - 'status'
+  - 'deployment/wandertogether-frontend'
+  - '-n'
+  - 'wandertogether'
+  env:
+  - 'CLOUDSDK_COMPUTE_REGION=${_GKE_REGION}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
+  id: 'verify-frontend-deployment'
+  waitFor: ['deploy-to-gke']
+
+# Get service information
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'get'
+  - 'services'
+  - '-o'
+  - 'wide'
+  - '-n'
+  - 'wandertogether'
+  env:
+  - 'CLOUDSDK_COMPUTE_REGION=${_GKE_REGION}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
+  id: 'get-services'
+  waitFor: ['verify-backend-deployment', 'verify-frontend-deployment']
+
+substitutions:
+  _GKE_CLUSTER: 'wandertogether-cluster'
+  _GKE_REGION: 'us-central1'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: '1800s'
+
+images:
+- 'gcr.io/$PROJECT_ID/wandertogether-backend:$COMMIT_SHA'
+- 'gcr.io/$PROJECT_ID/wandertogether-backend:latest'
+- 'gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA'
+- 'gcr.io/$PROJECT_ID/wandertogether-frontend:latest'

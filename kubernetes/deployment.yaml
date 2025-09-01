@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wandertogether-backend
+  namespace: wandertogether
+  labels:
+    app: wandertogether-backend
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wandertogether-backend
+  template:
+    metadata:
+      labels:
+        app: wandertogether-backend
+        version: v1
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/PROJECT_ID/wandertogether-backend:latest
+        ports:
+        - name: http-server
+          containerPort: 5000
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "5000"
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: wandertogether-config
+              key: NODE_ENV
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: DATABASE_URL
+        - name: SENDGRID_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: SENDGRID_API_KEY
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: ANTHROPIC_API_KEY
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: SESSION_SECRET
+        - name: PGHOST
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: PGHOST
+        - name: PGPORT
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: PGPORT
+        - name: PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: PGDATABASE
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: PGUSER
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: PGPASSWORD
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wandertogether-backend
+  namespace: wandertogether
+  labels:
+    app: wandertogether-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: wandertogether-backend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+    protocol: TCP
