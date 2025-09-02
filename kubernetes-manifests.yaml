@@ -194,7 +194,7 @@ metadata:
     app: wandertogether-backend
     version: v1
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: wandertogether-backend
@@ -324,7 +324,7 @@ metadata:
     app: wandertogether-frontend
     version: v1
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: wandertogether-frontend
@@ -486,8 +486,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: wandertogether-backend
-  minReplicas: 3
-  maxReplicas: 20
+  minReplicas: 1
+  maxReplicas: 1
   metrics:
   - type: Resource
     resource:
@@ -533,8 +533,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: wandertogether-frontend
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 1
   metrics:
   - type: Resource
     resource:
