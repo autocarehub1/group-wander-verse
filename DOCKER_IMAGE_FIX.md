@@ -117,9 +117,19 @@ Examples of how different project ID formats are handled:
 **Solution**: Ensure you've updated ALL files and that your PROJECT_ID environment variable is set correctly.
 
 ### Issue: Images not found during deployment  
-**Solution**: Make sure you've built and pushed the images with the correct lowercase project ID:
+**Solution**: Build and push the images with the correct project ID first:
 ```bash
-docker push gcr.io/your-lowercase-project/wandertogether-backend:latest
+# Build and push all images
+./scripts/build-and-push.sh
+
+# Or manually:
+PROJECT_ID_LOWER=$(gcloud config get-value project | tr '[:upper:]' '[:lower:]')
+docker build -t gcr.io/$PROJECT_ID_LOWER/wandertogether-backend:latest .
+docker build -f Dockerfile.frontend -t gcr.io/$PROJECT_ID_LOWER/wandertogether-frontend:latest .
+docker build -f Dockerfile.loadgenerator -t gcr.io/$PROJECT_ID_LOWER/wandertogether-loadgenerator:latest .
+docker push gcr.io/$PROJECT_ID_LOWER/wandertogether-backend:latest
+docker push gcr.io/$PROJECT_ID_LOWER/wandertogether-frontend:latest
+docker push gcr.io/$PROJECT_ID_LOWER/wandertogether-loadgenerator:latest
 ```
 
 ### Issue: Old images still being referenced
