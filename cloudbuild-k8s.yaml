@@ -23,6 +23,19 @@ steps:
   - '.'
   id: 'build-frontend'
 
+# Build loadgenerator image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.loadgenerator'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wandertogether-loadgenerator:$COMMIT_SHA'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest'
+  - '.'
+  id: 'build-loadgenerator'
+
 # Push backend image
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -39,6 +52,14 @@ steps:
   id: 'push-frontend'
   waitFor: ['build-frontend']
 
+# Push loadgenerator image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/wandertogether-loadgenerator:$COMMIT_SHA'
+  id: 'push-loadgenerator'
+  waitFor: ['build-loadgenerator']
+
 # Deploy to Kubernetes using kustomize
 - name: 'gcr.io/cloud-builders/gke-deploy'
   args:
@@ -46,11 +67,12 @@ steps:
   - --filename=kubernetes/
   - --image=gcr.io/$PROJECT_ID/wandertogether-backend:$COMMIT_SHA
   - --image=gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA
+  - --image=gcr.io/$PROJECT_ID/wandertogether-loadgenerator:$COMMIT_SHA
   - --location=${_GKE_REGION}
   - --cluster=${_GKE_CLUSTER}
   - --namespace=travel-app
   id: 'deploy-to-gke'
-  waitFor: ['push-backend', 'push-frontend']
+  waitFor: ['push-backend', 'push-frontend', 'push-loadgenerator']
 
 # Verify deployment
 - name: 'gcr.io/cloud-builders/kubectl'
@@ -109,3 +131,5 @@ images:
 - 'gcr.io/$PROJECT_ID/wandertogether-backend:latest'
 - 'gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA'
 - 'gcr.io/$PROJECT_ID/wandertogether-frontend:latest'
+- 'gcr.io/$PROJECT_ID/wandertogether-loadgenerator:$COMMIT_SHA'
+- 'gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest'

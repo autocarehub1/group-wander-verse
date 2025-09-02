@@ -639,3 +639,115 @@ spec:
     ports:
     - protocol: TCP
       port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+  namespace: travel-app
+  labels:
+    app: loadgenerator
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: loadgenerator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: loadgenerator
+        version: v1
+      annotations:
+        sidecar.istio.io/rewrite-app-http-probes: "true"
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      restartPolicy: Always
+      containers:
+      - name: main
+        image: gcr.io/PROJECT_ID/wandertogether-loadgenerator:latest
+        env:
+        - name: FRONTEND_ADDR
+          value: "wandertogether-frontend:80"
+        - name: USERS
+          value: "10"
+        - name: SPAWN_RATE
+          value: "2"
+        - name: LOCUST_WEB_PORT
+          value: "8089"
+        - name: LOCUST_LOG_LEVEL
+          value: "info"
+        - name: LOCUST_HOST
+          value: "http://wandertogether-frontend"
+        resources:
+          requests:
+            cpu: 300m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        ports:
+        - name: web
+          containerPort: 8089
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8089
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8089
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadgenerator
+  namespace: travel-app
+  labels:
+    app: loadgenerator
+spec:
+  type: ClusterIP
+  selector:
+    app: loadgenerator
+  ports:
+  - name: web
+    port: 8089
+    targetPort: 8089
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadgenerator-external
+  namespace: travel-app
+  labels:
+    app: loadgenerator
+spec:
+  type: LoadBalancer
+  selector:
+    app: loadgenerator
+  ports:
+  - name: web
+    port: 80
+    targetPort: 8089
+    protocol: TCP

@@ -13,6 +13,7 @@ resources:
 - ingress.yaml
 - hpa.yaml
 - network-policy.yaml
+- loadgenerator.yaml
 
 images:
 - name: wandertogether-backend
@@ -20,6 +21,9 @@ images:
   newTag: latest
 - name: wandertogether-frontend
   newName: gcr.io/PROJECT_ID/wandertogether-frontend
+  newTag: latest
+- name: wandertogether-loadgenerator
+  newName: gcr.io/PROJECT_ID/wandertogether-loadgenerator
   newTag: latest
 
 replicas:

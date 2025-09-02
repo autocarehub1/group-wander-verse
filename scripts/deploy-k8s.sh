@@ -127,10 +127,15 @@ build_images() {
     echo_info "Building frontend image..."
     docker build -f Dockerfile.frontend -t gcr.io/$PROJECT_ID/wandertogether-frontend:latest .
     
+    # Build loadgenerator image
+    echo_info "Building loadgenerator image..."
+    docker build -f Dockerfile.loadgenerator -t gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest .
+    
     # Push images
     echo_info "Pushing images to registry..."
     docker push gcr.io/$PROJECT_ID/wandertogether-backend:latest
     docker push gcr.io/$PROJECT_ID/wandertogether-frontend:latest
+    docker push gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest
     
     echo_success "Images built and pushed successfully"
 }

@@ -75,6 +75,14 @@ jobs:
           --tag "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:latest" \
           .
 
+    - name: Build Loadgenerator Image
+      run: |-
+        docker build \
+          --file Dockerfile.loadgenerator \
+          --tag "gcr.io/$PROJECT_ID/wandertogether-loadgenerator:$GITHUB_SHA" \
+          --tag "gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest" \
+          .
+
     # Push the Docker images to Google Container Registry
     - name: Push Backend Image
       run: |-
@@ -85,6 +93,11 @@ jobs:
       run: |-
         docker push "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:$GITHUB_SHA"
         docker push "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:latest"
+
+    - name: Push Loadgenerator Image
+      run: |-
+        docker push "gcr.io/$PROJECT_ID/wandertogether-loadgenerator:$GITHUB_SHA"
+        docker push "gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest"
 
     # Set up Kustomize
     - name: Set up Kustomize
