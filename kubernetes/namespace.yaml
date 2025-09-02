@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: wandertogether
+  name: travel-app
   labels:
-    name: wandertogether
+    name: travel-app
     app: wandertogether-travel-app

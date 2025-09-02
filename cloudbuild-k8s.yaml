@@ -48,7 +48,7 @@ steps:
   - --image=gcr.io/$PROJECT_ID/wandertogether-frontend:$COMMIT_SHA
   - --location=${_GKE_REGION}
   - --cluster=${_GKE_CLUSTER}
-  - --namespace=wandertogether
+  - --namespace=travel-app
   id: 'deploy-to-gke'
   waitFor: ['push-backend', 'push-frontend']
 
@@ -59,7 +59,7 @@ steps:
   - 'status'
   - 'deployment/wandertogether-backend'
   - '-n'
-  - 'wandertogether'
+  - 'travel-app'
   env:
   - 'CLOUDSDK_COMPUTE_REGION=${_GKE_REGION}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
@@ -72,7 +72,7 @@ steps:
   - 'status'
   - 'deployment/wandertogether-frontend'
   - '-n'
-  - 'wandertogether'
+  - 'travel-app'
   env:
   - 'CLOUDSDK_COMPUTE_REGION=${_GKE_REGION}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'
@@ -87,7 +87,7 @@ steps:
   - '-o'
   - 'wide'
   - '-n'
-  - 'wandertogether'
+  - 'travel-app'
   env:
   - 'CLOUDSDK_COMPUTE_REGION=${_GKE_REGION}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER}'

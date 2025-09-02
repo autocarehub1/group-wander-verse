@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: wandertogether-backend-hpa
-  namespace: wandertogether
+  namespace: travel-app
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -49,7 +49,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: wandertogether-frontend-hpa
-  namespace: wandertogether
+  namespace: travel-app
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

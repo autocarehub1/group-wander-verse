@@ -106,11 +106,11 @@ jobs:
         ./kustomize build kubernetes/ | kubectl apply -f -
         
         # Verify deployment
-        kubectl rollout status deployment/wandertogether-backend -n wandertogether
-        kubectl rollout status deployment/wandertogether-frontend -n wandertogether
+        kubectl rollout status deployment/wandertogether-backend -n travel-app
+        kubectl rollout status deployment/wandertogether-frontend -n travel-app
         
         # Get the external IP
-        kubectl get services -o wide -n wandertogether
+        kubectl get services -o wide -n travel-app
 
     # Slack notification on success
     - name: Slack Notification - Success

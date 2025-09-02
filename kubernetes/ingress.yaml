@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: wandertogether-ingress
-  namespace: wandertogether
+  namespace: travel-app
   annotations:
     kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.global-static-ip-name: "wandertogether-ip"
@@ -34,7 +34,7 @@ apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
   name: wandertogether-ssl-cert
-  namespace: wandertogether
+  namespace: travel-app
 spec:
   domains:
     - wandertogether.example.com
@@ -43,7 +43,7 @@ apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
   name: wandertogether-backendconfig
-  namespace: wandertogether
+  namespace: travel-app
 spec:
   healthCheck:
     checkIntervalSec: 10

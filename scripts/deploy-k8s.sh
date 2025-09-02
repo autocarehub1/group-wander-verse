@@ -9,7 +9,7 @@ set -e
 PROJECT_ID=${PROJECT_ID:-"your-gcp-project-id"}
 CLUSTER_NAME=${CLUSTER_NAME:-"wandertogether-cluster"}
 REGION=${REGION:-"us-central1"}
-NAMESPACE="wandertogether"
+NAMESPACE="travel-app"
 
 # Colors for output
 RED='\033[0;31m'

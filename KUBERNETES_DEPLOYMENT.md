@@ -15,7 +15,7 @@ kubectl apply -f kubernetes-manifests.yaml
 export PROJECT_ID=your-gcp-project-id
 export REGION=us-central1
 
-gcloud container clusters create-auto wandertogether-cluster \
+gcloud container clusters create-auto travel-app-cluster \
     --project=$PROJECT_ID \
     --region=$REGION
 ```
@@ -23,12 +23,12 @@ gcloud container clusters create-auto wandertogether-cluster \
 2. **Docker Images**: Build and push your application images
 ```bash
 # Build and push backend
-docker build -t gcr.io/$PROJECT_ID/wandertogether-backend:latest .
-docker push gcr.io/$PROJECT_ID/wandertogether-backend:latest
+docker build -t gcr.io/$PROJECT_ID/travel-app-backend:latest .
+docker push gcr.io/$PROJECT_ID/travel-app-backend:latest
 
 # Build and push frontend  
-docker build -f Dockerfile.frontend -t gcr.io/$PROJECT_ID/wandertogether-frontend:latest .
-docker push gcr.io/$PROJECT_ID/wandertogether-frontend:latest
+docker build -f Dockerfile.frontend -t gcr.io/$PROJECT_ID/travel-app-frontend:latest .
+docker push gcr.io/$PROJECT_ID/travel-app-frontend:latest
 ```
 
 3. **Update Image References**: Replace `PROJECT_ID` in kubernetes-manifests.yaml
@@ -58,12 +58,12 @@ echo -n "your-session-secret" | base64
 
 ### 2. Configure Domain
 
-Replace `wandertogether.example.com` with your actual domain in the Ingress section.
+Replace `travel-app.example.com` with your actual domain in the Ingress section.
 
 ### 3. Reserve Static IP (Optional)
 
 ```bash
-gcloud compute addresses create wandertogether-ip --global
+gcloud compute addresses create travel-app-ip --global
 ```
 
 ## Deployment
@@ -80,23 +80,23 @@ Check deployment status:
 
 ```bash
 # Check pods
-kubectl get pods -n wandertogether
+kubectl get pods -n travel-app
 
 # Check services
-kubectl get svc -n wandertogether
+kubectl get svc -n travel-app
 
 # Check ingress
-kubectl get ingress -n wandertogether
+kubectl get ingress -n travel-app
 
 # View logs
-kubectl logs -f deployment/wandertogether-backend -n wandertogether
+kubectl logs -f deployment/travel-app-backend -n travel-app
 ```
 
 ## Architecture Overview
 
 The deployment includes:
 
-- **Namespace**: `wandertogether` for resource isolation
+- **Namespace**: `travel-app` for resource isolation
 - **Backend**: Node.js Express API (3-20 replicas with HPA)
 - **Frontend**: Nginx reverse proxy (2-10 replicas with HPA)
 - **Ingress**: GKE Ingress with SSL and CDN
@@ -120,13 +120,13 @@ Access application metrics:
 
 ```bash
 # Pod resource usage
-kubectl top pods -n wandertogether
+kubectl top pods -n travel-app
 
 # HPA status
-kubectl get hpa -n wandertogether
+kubectl get hpa -n travel-app
 
 # Events
-kubectl get events -n wandertogether
+kubectl get events -n travel-app
 ```
 
 ## Scaling
@@ -135,10 +135,10 @@ Manual scaling:
 
 ```bash
 # Scale backend
-kubectl scale deployment wandertogether-backend --replicas=5 -n wandertogether
+kubectl scale deployment travel-app-backend --replicas=5 -n travel-app
 
 # Scale frontend
-kubectl scale deployment wandertogether-frontend --replicas=3 -n wandertogether
+kubectl scale deployment travel-app-frontend --replicas=3 -n travel-app
 ```
 
 Automatic scaling is configured via HPA based on CPU and memory utilization.
@@ -149,16 +149,16 @@ Common debugging commands:
 
 ```bash
 # Describe pod issues
-kubectl describe pod <pod-name> -n wandertogether
+kubectl describe pod <pod-name> -n travel-app
 
 # Check service endpoints
-kubectl get endpoints -n wandertogether
+kubectl get endpoints -n travel-app
 
 # View detailed logs
-kubectl logs -f deployment/wandertogether-backend -n wandertogether --previous
+kubectl logs -f deployment/travel-app-backend -n travel-app --previous
 
 # Execute into pod
-kubectl exec -it deployment/wandertogether-backend -n wandertogether -- sh
+kubectl exec -it deployment/travel-app-backend -n travel-app -- sh
 ```
 
 ## Production Checklist
