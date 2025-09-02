@@ -63,16 +63,16 @@ jobs:
     - name: Build Backend Image
       run: |-
         docker build \
-          --tag "gcr.io/$PROJECT_ID/$IMAGE_BACKEND:$GITHUB_SHA" \
-          --tag "gcr.io/$PROJECT_ID/$IMAGE_BACKEND:latest" \
+          --tag "gcr.io/project-id/$IMAGE_BACKEND:$GITHUB_SHA" \
+          --tag "gcr.io/project-id/$IMAGE_BACKEND:latest" \
           .
 
     - name: Build Frontend Image
       run: |-
         docker build \
           --file Dockerfile.frontend \
-          --tag "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:$GITHUB_SHA" \
-          --tag "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:latest" \
+          --tag "gcr.io/project-id/$IMAGE_FRONTEND:$GITHUB_SHA" \
+          --tag "gcr.io/project-id/$IMAGE_FRONTEND:latest" \
           .
 
     - name: Build Loadgenerator Image
@@ -86,13 +86,13 @@ jobs:
     # Push the Docker images to Google Container Registry
     - name: Push Backend Image
       run: |-
-        docker push "gcr.io/$PROJECT_ID/$IMAGE_BACKEND:$GITHUB_SHA"
-        docker push "gcr.io/$PROJECT_ID/$IMAGE_BACKEND:latest"
+        docker push "gcr.io/project-id/$IMAGE_BACKEND:$GITHUB_SHA"
+        docker push "gcr.io/project-id/$IMAGE_BACKEND:latest"
 
     - name: Push Frontend Image
       run: |-
-        docker push "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:$GITHUB_SHA"
-        docker push "gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:latest"
+        docker push "gcr.io/project-id/$IMAGE_FRONTEND:$GITHUB_SHA"
+        docker push "gcr.io/project-id/$IMAGE_FRONTEND:latest"
 
     - name: Push Loadgenerator Image
       run: |-
@@ -112,8 +112,8 @@ jobs:
         sed -i.bak "s/PROJECT_ID/$PROJECT_ID/g" kubernetes/kustomization.yaml
         
         # Set the image tags to the current commit SHA
-        ./kustomize edit set image gcr.io/PROJECT_ID/wandertogether-backend=gcr.io/$PROJECT_ID/$IMAGE_BACKEND:$GITHUB_SHA
-        ./kustomize edit set image gcr.io/PROJECT_ID/wandertogether-frontend=gcr.io/$PROJECT_ID/$IMAGE_FRONTEND:$GITHUB_SHA
+        ./kustomize edit set image gcr.io/PROJECT_ID/wandertogether-backend=gcr.io/project-id/$IMAGE_BACKEND:$GITHUB_SHA
+        ./kustomize edit set image gcr.io/PROJECT_ID/wandertogether-frontend=gcr.io/project-id/$IMAGE_FRONTEND:$GITHUB_SHA
         
         # Apply the kustomized configuration
         ./kustomize build kubernetes/ | kubectl apply -f -

@@ -119,23 +119,27 @@ build_images() {
     # Configure Docker for GCR
     gcloud auth configure-docker gcr.io
     
+    # Convert PROJECT_ID to lowercase for Docker compatibility
+    PROJECT_ID_LOWER=$(echo "$PROJECT_ID" | tr '[:upper:]' '[:lower:]')
+    echo_info "Using lowercase PROJECT_ID: $PROJECT_ID_LOWER"
+
     # Build backend image
     echo_info "Building backend image..."
-    docker build -t gcr.io/$PROJECT_ID/wandertogether-backend:latest .
+    docker build -t gcr.io/$PROJECT_ID_LOWER/wandertogether-backend:latest .
     
     # Build frontend image
     echo_info "Building frontend image..."
-    docker build -f Dockerfile.frontend -t gcr.io/$PROJECT_ID/wandertogether-frontend:latest .
+    docker build -f Dockerfile.frontend -t gcr.io/$PROJECT_ID_LOWER/wandertogether-frontend:latest .
     
     # Build loadgenerator image
     echo_info "Building loadgenerator image..."
-    docker build -f Dockerfile.loadgenerator -t gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest .
+    docker build -f Dockerfile.loadgenerator -t gcr.io/$PROJECT_ID_LOWER/wandertogether-loadgenerator:latest .
     
     # Push images
     echo_info "Pushing images to registry..."
-    docker push gcr.io/$PROJECT_ID/wandertogether-backend:latest
-    docker push gcr.io/$PROJECT_ID/wandertogether-frontend:latest
-    docker push gcr.io/$PROJECT_ID/wandertogether-loadgenerator:latest
+    docker push gcr.io/$PROJECT_ID_LOWER/wandertogether-backend:latest
+    docker push gcr.io/$PROJECT_ID_LOWER/wandertogether-frontend:latest
+    docker push gcr.io/$PROJECT_ID_LOWER/wandertogether-loadgenerator:latest
     
     echo_success "Images built and pushed successfully"
 }

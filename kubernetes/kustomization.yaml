@@ -17,13 +17,13 @@ resources:
 
 images:
 - name: wandertogether-backend
-  newName: gcr.io/PROJECT_ID/wandertogether-backend
+  newName: gcr.io/project-id-lowercase/wandertogether-backend
   newTag: latest
 - name: wandertogether-frontend
-  newName: gcr.io/PROJECT_ID/wandertogether-frontend
+  newName: gcr.io/project-id-lowercase/wandertogether-frontend
   newTag: latest
 - name: wandertogether-loadgenerator
-  newName: gcr.io/PROJECT_ID/wandertogether-loadgenerator
+  newName: gcr.io/project-id-lowercase/wandertogether-loadgenerator
   newTag: latest
 
 replicas:

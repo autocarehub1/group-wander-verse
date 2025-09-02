@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: server
-        image: gcr.io/PROJECT_ID/wandertogether-backend:latest
+        image: gcr.io/project-id/wandertogether-backend:latest
         ports:
         - name: http-server
           containerPort: 5000
