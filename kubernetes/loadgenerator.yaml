@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: main
-        image: gcr.io/project-id-lowercase/wandertogether-loadgenerator:latest
+        image: gcr.io/keen-opus-470223-b7/wandertogether-loadgenerator:latest
         env:
         - name: FRONTEND_ADDR
           value: "wandertogether-frontend:80"
