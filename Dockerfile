@@ -20,8 +20,9 @@ RUN npm run build
 FROM node:20-slim AS production
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN addgroup --gid 1001 nodejs \
+    && adduser --uid 1001 --gid 1001 --disabled-password --        gecos "" nodejs
+
 
 # Set working directory
 WORKDIR /app
