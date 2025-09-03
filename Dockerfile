@@ -1,5 +1,5 @@
-# Multi-stage build for production optimization
-FROM node:20-slim AS builder
+# Simple single-stage build following loadgenerator pattern
+FROM node:20-slim
 
 # Set working directory
 WORKDIR /app
@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (including dev dependencies for building)
+# Install dependencies
 RUN npm install --omit=optional
 
 # Copy source code
@@ -16,28 +16,9 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM node:20-slim AS production
-
 # Create non-root user for security
 RUN addgroup --gid 1001 nodejs \
   && adduser --uid 1001 --gid 1001 --disabled-password --gecos "" nodejs
-
-
-# Set working directory
-WORKDIR /app
-
-# Copy production package.json
-COPY package.prod.json package.json
-
-# Install only production dependencies
-RUN npm install --omit=optional
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Copy any static assets if needed
-COPY --from=builder /app/dist/public ./dist/public
 
 # Create necessary directories and set permissions
 RUN mkdir -p /tmp && \

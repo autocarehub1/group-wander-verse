@@ -1,7 +1,10 @@
-# Multi-stage build for frontend
-FROM node:20-slim AS builder
+# Simple single-stage build following loadgenerator pattern
+FROM nginx:1.25-alpine
 
 WORKDIR /app
+
+# Install dependencies for building
+RUN apk add --no-cache nodejs npm yq
 
 # Copy package files
 COPY package*.json ./
@@ -12,31 +15,26 @@ RUN npm install --omit=optional
 # Copy source code
 COPY . .
 
-# Build frontend only
+# Build frontend
 RUN npx vite build
 
-# Production nginx stage
-FROM nginx:1.25-alpine AS production
+# Extract and copy nginx config
+RUN yq eval '.data."nginx.conf"' kubernetes/nginx-config.yaml > /etc/nginx/nginx.conf
+
+# Copy built frontend assets
+RUN cp -r dist/public/* /usr/share/nginx/html/
 
 # Create non-root user
 RUN addgroup -g 101 -S nginx || true
-
-# Copy nginx configuration
-COPY kubernetes/nginx-config.yaml /tmp/nginx-config.yaml
-
-# Extract nginx config from ConfigMap format to actual config
-RUN apk add --no-cache yq && \
-    yq eval '.data."nginx.conf"' /tmp/nginx-config.yaml > /etc/nginx/nginx.conf && \
-    rm /tmp/nginx-config.yaml && \
-    apk del yq
-
-# Copy built frontend assets
-COPY --from=builder /app/dist/public /usr/share/nginx/html
 
 # Create necessary directories and set permissions
 RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
     chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
+
+# Clean up build dependencies
+RUN apk del nodejs npm yq && \
+    rm -rf /app
 
 # Switch to non-root user
 USER nginx
