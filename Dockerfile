@@ -21,7 +21,7 @@ FROM node:20-slim AS production
 
 # Create non-root user for security
 RUN addgroup --gid 1001 nodejs \
-    && adduser --uid 1001 --gid 1001 --disabled-password --        gecos "" nodejs
+  && adduser --uid 1001 --gid 1001 --disabled-password --gecos "" nodejs
 
 
 # Set working directory
