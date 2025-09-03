@@ -1,100 +1,66 @@
 #!/usr/bin/env node
 
-/**
- * Deployment verification script for Node.js App Engine applications
- * This script helps verify that your app is properly configured for deployment
- */
+// Deployment Verification Script for WanderTogether GKE
 
-import fs from 'fs';
-import path from 'path';
+const { execSync } = require('child_process');
 
-console.log('🔍 Verifying App Engine deployment configuration...\n');
+console.log('🔍 Verifying WanderTogether GKE Deployment...\n');
 
-const checks = [];
-
-// Check 1: app.yaml exists and has required fields
-if (fs.existsSync('app.yaml')) {
-  const appYaml = fs.readFileSync('app.yaml', 'utf8');
-  if (appYaml.includes('runtime: nodejs')) {
-    checks.push('✅ app.yaml exists with Node.js runtime');
-  } else {
-    checks.push('❌ app.yaml missing Node.js runtime specification');
-  }
-} else {
-  checks.push('❌ app.yaml file not found');
-}
-
-// Check 2: Health check endpoint implementation
-const serverPath = 'server/index.ts';
-if (fs.existsSync(serverPath)) {
-  const serverCode = fs.readFileSync(serverPath, 'utf8');
-  if (serverCode.includes('/health') && serverCode.includes('healthy')) {
-    checks.push('✅ Health check endpoint implemented');
-  } else {
-    checks.push('❌ Health check endpoint missing');
-  }
-} else {
-  checks.push('❌ server/index.ts not found');
-}
-
-// Check 3: Port configuration
-if (fs.existsSync(serverPath)) {
-  const serverCode = fs.readFileSync(serverPath, 'utf8');
-  if (serverCode.includes('process.env.PORT')) {
-    checks.push('✅ Dynamic port configuration (process.env.PORT)');
-  } else {
-    checks.push('❌ Hardcoded port - will cause deployment issues');
+function runCommand(command, description) {
+  console.log(`📋 ${description}`);
+  try {
+    const output = execSync(command, { encoding: 'utf8', stdio: 'pipe' });
+    console.log(output);
+    return true;
+  } catch (error) {
+    console.error(`❌ Error: ${error.message}`);
+    if (error.stdout) console.log('Output:', error.stdout);
+    if (error.stderr) console.error('Error:', error.stderr);
+    return false;
   }
 }
 
-// Check 4: Package.json has required scripts
-if (fs.existsSync('package.json')) {
-  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const scripts = packageJson.scripts || {};
-  
-  if (scripts.build && scripts.start) {
-    checks.push('✅ Build and start scripts configured');
-  } else {
-    checks.push('❌ Missing build or start scripts in package.json');
-  }
-} else {
-  checks.push('❌ package.json not found');
+// Check cluster connectivity
+if (!runCommand('kubectl cluster-info', 'Checking cluster connectivity')) {
+  console.error('❌ Cannot connect to Kubernetes cluster');
+  process.exit(1);
 }
 
-// Check 5: .gcloudignore exists
-if (fs.existsSync('.gcloudignore')) {
-  checks.push('✅ .gcloudignore file exists (optimizes deployment)');
-} else {
-  checks.push('⚠️  .gcloudignore missing (optional but recommended)');
+// Check nodes
+if (!runCommand('kubectl get nodes', 'Checking cluster nodes')) {
+  console.error('❌ No nodes available in cluster');
+  process.exit(1);
 }
 
-// Check 6: Cloud Build configuration
-if (fs.existsSync('cloudbuild.yaml')) {
-  checks.push('✅ Cloud Build configuration available');
-} else {
-  checks.push('ℹ️  cloudbuild.yaml not found (optional for GitHub integration)');
-}
+// Check if namespace exists
+runCommand('kubectl get namespace travel-app', 'Checking travel-app namespace');
 
-// Print results
-console.log('📋 Deployment Readiness Report:\n');
-checks.forEach(check => console.log(`   ${check}`));
+// Check deployments
+runCommand('kubectl get deployments -n travel-app', 'Checking deployments');
 
-const errors = checks.filter(check => check.includes('❌')).length;
-const warnings = checks.filter(check => check.includes('⚠️')).length;
+// Check pods
+runCommand('kubectl get pods -n travel-app', 'Checking pod status');
 
-console.log('\n' + '='.repeat(60));
+// Check services
+runCommand('kubectl get services -n travel-app', 'Checking services');
 
-if (errors === 0) {
-  console.log('🎉 Your application is ready for App Engine deployment!');
-  console.log('\n📚 Next steps:');
-  console.log('   1. Run: gcloud app deploy');
-  console.log('   2. Visit your deployed app');
-  console.log('   3. Check health endpoint: /health');
-} else {
-  console.log(`❗ Found ${errors} error(s) that need to be fixed before deployment.`);
-  if (warnings > 0) {
-    console.log(`   Also found ${warnings} warning(s) - these won't break deployment but should be addressed.`);
-  }
-}
+// Check events for any issues
+runCommand('kubectl get events --sort-by=.metadata.creationTimestamp -n travel-app', 'Checking recent events');
 
-console.log('\n🔗 For detailed deployment instructions, see: DEPLOYMENT_README.md');
+// Check for image pull issues
+console.log('\n🔍 Checking for image availability...');
+const images = [
+  'gcr.io/keen-opus-470223-b7/wandertogether-backend:latest',
+  'gcr.io/keen-opus-470223-b7/wandertogether-frontend:latest',
+  'gcr.io/keen-opus-470223-b7/wandertogether-loadgenerator:latest'
+];
+
+images.forEach(image => {
+  runCommand(`gcloud container images describe ${image}`, `Checking image: ${image}`);
+});
+
+console.log('\n✅ Deployment verification complete!');
+console.log('\n📊 Summary:');
+console.log('- If pods show "Running" status: Deployment successful');
+console.log('- If pods show "Pending" or "ImagePullBackOff": Build images first');
+console.log('- If pods show "CrashLoopBackOff": Check application logs');

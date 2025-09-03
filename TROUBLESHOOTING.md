@@ -1,58 +1,128 @@
-# WanderTogether GCP Deployment Troubleshooting
+# Kubernetes Deployment Troubleshooting
 
-## Common Build Issues and Solutions
+## Current Error: PodUnschedulable
 
-### 1. "vite: not found" Error
-**Cause:** Build tools not installed during Cloud Build
-**Solution:** Ensure `--production=false` flag is used with npm install
+This error indicates that Kubernetes cannot schedule pods to run on available nodes.
 
-### 2. "Service Unavailable" After Deployment
-**Cause:** App not listening on correct port or health checks failing
-**Solutions:**
-- Verify server uses `process.env.PORT` or `8080` default
-- Ensure `/health` endpoint exists and returns 200
-- Check App Engine logs for startup errors
+### Common Causes and Solutions
 
-### 3. Build Step Failures
-**Cause:** Missing dependencies or configuration issues
-**Solutions:**
-- Check Cloud Build logs for specific error messages
-- Verify all devDependencies are properly installed
-- Ensure TypeScript/Vite configuration is correct
+#### 1. Insufficient Cluster Resources
+**Problem**: Not enough CPU/memory on cluster nodes
+**Check**:
+```bash
+kubectl describe nodes
+kubectl top nodes
+kubectl get pods -n travel-app -o wide
+```
 
-### 4. Memory or Timeout Issues
-**Cause:** Complex builds exceeding Cloud Build limits
-**Solutions:**
-- Increase timeout in app.yaml (max 1800s)
-- Use smaller dependency set for production
-- Pre-build assets locally and commit to repo
+**Solution**: Scale up cluster or reduce resource requests
 
-## Deployment Commands
+#### 2. No Available Nodes
+**Problem**: Cluster has no worker nodes or nodes are not ready
+**Check**:
+```bash
+kubectl get nodes
+kubectl describe nodes
+```
+
+**Solution**: 
+- Ensure cluster has worker nodes
+- Check node pool configuration
+- Verify nodes are in "Ready" state
+
+#### 3. Resource Requests Too High
+**Problem**: Pod resource requests exceed available node capacity
+**Check**: Look at resource requests in deployment manifests
+
+**Solution**: Reduce resource requests in kubernetes-manifests.yaml
+
+#### 4. Node Selector/Affinity Issues
+**Problem**: Pods can't find nodes matching their requirements
+**Check**: Look for nodeSelector or affinity rules
+
+**Solution**: Remove or adjust node selectors
+
+#### 5. Cluster Autoscaler Issues
+**Problem**: Cluster autoscaler not creating new nodes
+**Check**:
+```bash
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+**Solution**: Enable cluster autoscaler or manually add nodes
+
+## Immediate Fixes
+
+### Fix 1: Check Cluster Status
+```bash
+# Check if cluster exists and is accessible
+kubectl cluster-info
+
+# Check nodes
+kubectl get nodes -o wide
+
+# Check if nodes are ready
+kubectl describe nodes
+```
+
+### Fix 2: Reduce Resource Requirements
+Update kubernetes-manifests.yaml to use minimal resources:
+
+```yaml
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+```
+
+### Fix 3: Check Cluster Capacity
+```bash
+# See what resources are available
+kubectl describe nodes
+
+# Check current resource usage
+kubectl top nodes
+kubectl top pods -n travel-app
+```
+
+### Fix 4: Enable Cluster Autoscaler (if needed)
+```bash
+# Check if cluster autoscaler is enabled
+gcloud container clusters describe keen-opus-cluster \
+  --zone=your-zone \
+  --format="value(nodePools[].autoscaling)"
+```
+
+## Quick Recovery Commands
 
 ```bash
-# Deploy using Cloud Build
-gcloud builds submit --config=app.yaml
+# Delete existing deployment
+kubectl delete -f kubernetes-manifests.yaml
 
-# Check deployment status
-gcloud app versions list
+# Wait for cleanup
+kubectl get pods -n travel-app
 
-# View application logs
-gcloud app logs tail -s default
+# Redeploy with fixed configuration
+kubectl apply -f kubernetes-manifests.yaml
 ```
 
-## File Structure for GCP Deployment
-```
-├── app.yaml              # Cloud Build configuration
-├── app.engine.yaml       # App Engine runtime configuration  
-├── package.json          # Dependencies and build scripts
-├── server/
-│   └── index.ts          # Express server entry point
-├── dist/                 # Build output (generated)
-│   ├── index.js          # Built server
-│   └── public/           # Built client assets
+## Cluster Creation (if needed)
+If cluster doesn't exist or has issues:
+
+```bash
+# Create new GKE cluster with autoscaling
+gcloud container clusters create keen-opus-cluster \
+  --zone=us-central1-a \
+  --num-nodes=3 \
+  --enable-autoscaling \
+  --min-nodes=1 \
+  --max-nodes=10 \
+  --machine-type=e2-standard-2 \
+  --enable-autorepair \
+  --enable-autoupgrade
 ```
 
-## Health Check Requirements
-App Engine requires these endpoints:
-- `GET /health` - Returns 200 OK for health checks
-- Server must bind to `0.0.0.0:${PORT}` where PORT is provided by App Engine
+The PodUnschedulable error is usually resolved by ensuring adequate cluster resources or adjusting pod resource requirements.
