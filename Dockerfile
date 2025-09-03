@@ -30,7 +30,7 @@ WORKDIR /app
 COPY package.prod.json package.json
 
 # Install only production dependencies
-RUN npm ci --no-optional
+RUN npm install --production --omit=optional
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
