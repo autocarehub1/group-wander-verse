@@ -9,9 +9,17 @@ PROJECT_ID="keen-opus-470223-b7"
 
 echo "Building and pushing Docker images for $PROJECT_ID..."
 
-# Configure Docker authentication
+# Set GCP project
+echo "Setting GCP project..."
+gcloud config set project $PROJECT_ID
+
+# Configure Docker authentication for GCR (not Docker Hub)
 echo "Configuring Docker for Google Container Registry..."
 gcloud auth configure-docker gcr.io --quiet
+
+# Verify authentication
+echo "Verifying GCP authentication..."
+gcloud auth list
 
 # Build backend image
 echo "Building backend image..."
