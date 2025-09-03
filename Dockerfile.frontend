@@ -19,7 +19,7 @@ RUN npx vite build
 FROM nginx:1.25-alpine AS production
 
 # Create non-root user
-RUN addgroup -g 101 -S nginx
+RUN addgroup -g 101 -S nginx || true
 
 # Copy nginx configuration
 COPY kubernetes/nginx-config.yaml /tmp/nginx-config.yaml
