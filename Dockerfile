@@ -1,5 +1,5 @@
 # Multi-stage build for production optimization
-FROM node:20 AS builder
+FROM node:20-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:20-slim AS production
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
