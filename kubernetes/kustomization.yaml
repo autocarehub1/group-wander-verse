@@ -28,9 +28,9 @@ images:
 
 replicas:
 - name: wandertogether-backend
-  count: 3
+  count: 1
 - name: wandertogether-frontend
-  count: 2
+  count: 1
 
 patchesStrategicMerge:
 - |-
