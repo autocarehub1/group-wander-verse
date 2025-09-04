@@ -336,7 +336,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.25-alpine
+        image: gcr.io/keen-opus-470223-b7/wandertogether-frontend:latest
         ports:
         - name: http
           containerPort: 80
