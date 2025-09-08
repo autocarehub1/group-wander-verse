@@ -18,13 +18,14 @@ RUN npx vite build
 # Install nginx
 RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 
-# Copy built assets to nginx
+# Create nginx directories and copy assets
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/www/html
 RUN cp -r dist/public/* /var/www/html/
 
 # Create simple nginx config
 RUN echo 'server { listen 80; root /var/www/html; index index.html; location / { try_files $uri $uri/ /index.html; } }' > /etc/nginx/sites-available/default
 
-# Create non-root user
+# Create non-root user and set permissions
 RUN groupadd -r nginx && useradd -r -g nginx nginx
 RUN chown -R nginx:nginx /var/www/html /var/log/nginx /var/cache/nginx
 USER nginx
