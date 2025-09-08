@@ -1,10 +1,7 @@
-# Simple single-stage build following loadgenerator pattern
-FROM nginx:1.25-alpine
+# Frontend for WanderTogether Travel App
+FROM node:20-slim
 
 WORKDIR /app
-
-# Install dependencies for building
-RUN apk add --no-cache nodejs npm yq
 
 # Copy package files
 COPY package*.json ./
@@ -18,33 +15,22 @@ COPY . .
 # Build frontend
 RUN npx vite build
 
-# Extract and copy nginx config
-RUN yq eval '.data."nginx.conf"' kubernetes/nginx-config.yaml > /etc/nginx/nginx.conf
+# Install nginx
+RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 
-# Copy built frontend assets
-RUN cp -r dist/public/* /usr/share/nginx/html/
+# Copy built assets to nginx
+RUN cp -r dist/public/* /var/www/html/
+
+# Create simple nginx config
+RUN echo 'server { listen 80; root /var/www/html; index index.html; location / { try_files $uri $uri/ /index.html; } }' > /etc/nginx/sites-available/default
 
 # Create non-root user
-RUN addgroup -g 101 -S nginx || true
-
-# Create necessary directories and set permissions
-RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
-    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run /usr/share/nginx/html && \
-    chmod -R 755 /usr/share/nginx/html
-
-# Clean up build dependencies
-RUN apk del nodejs npm yq && \
-    rm -rf /app
-
-# Switch to non-root user
+RUN groupadd -r nginx && useradd -r -g nginx nginx
+RUN chown -R nginx:nginx /var/www/html /var/log/nginx /var/cache/nginx
 USER nginx
 
 # Expose port
 EXPOSE 80
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
