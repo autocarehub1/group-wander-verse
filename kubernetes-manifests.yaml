@@ -289,14 +289,7 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
+
 ---
 apiVersion: v1
 kind: Service
@@ -341,14 +334,6 @@ spec:
         - name: http
           containerPort: 80
           protocol: TCP
-        volumeMounts:
-        - name: nginx-config
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
-          readOnly: true
-        - name: static-files
-          mountPath: /usr/share/nginx/html
-          readOnly: true
         resources:
           requests:
             cpu: 50m
@@ -374,21 +359,6 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 3
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 101
-          readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-      volumes:
-      - name: nginx-config
-        configMap:
-          name: nginx-config
-      - name: static-files
-        configMap:
-          name: frontend-static-files
 ---
 apiVersion: v1
 kind: Service
@@ -709,14 +679,7 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
+
 ---
 apiVersion: v1
 kind: Service
