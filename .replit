@@ -8,8 +8,7 @@ packages = ["android-tools", "android-udev-rules", "wget", "unzip", "iproute2", 
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
-run = ["npm", "run", "start"]
+run = ["sh", "-c", "npm run dev"]
 
 [[ports]]
 localPort = 5000
