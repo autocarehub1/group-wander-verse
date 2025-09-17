@@ -1,0 +1,161 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "wandertogether-backend"
+  namespace: "default"
+  labels:
+    app: "wandertogether-backend"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "wandertogether-backend"
+  template:
+    metadata:
+      labels:
+        app: "wandertogether-backend"
+    spec:
+      containers:
+      - name: "backend"
+        image: "gcr.io/keen-opus-470223-b7/wandertogether-backend:latest"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "wandertogether-backend-hpa"
+  namespace: "default"
+  labels:
+    app: "wandertogether-backend"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "wandertogether-backend"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "wandertogether-backend-service"
+  namespace: "default"
+  labels:
+    app: "wandertogether-backend"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 5000
+  selector:
+    app: "wandertogether-backend"
+  type: "ClusterIP"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "wandertogether-frontend"
+  namespace: "default"
+  labels:
+    app: "wandertogether-frontend"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "wandertogether-frontend"
+  template:
+    metadata:
+      labels:
+        app: "wandertogether-frontend"
+    spec:
+      containers:
+      - name: "frontend"
+        image: "gcr.io/keen-opus-470223-b7/wandertogether-frontend:latest"
+        ports:
+        - containerPort: 80
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "wandertogether-frontend-hpa"
+  namespace: "default"
+  labels:
+    app: "wandertogether-frontend"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "wandertogether-frontend"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "wandertogether-frontend-service"
+  namespace: "default"
+  labels:
+    app: "wandertogether-frontend"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+  selector:
+    app: "wandertogether-frontend"
+  type: "LoadBalancer"
+  loadBalancerIP: ""
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "wandertogether-loadgenerator"
+  namespace: "default"
+  labels:
+    app: "wandertogether-loadgenerator"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "wandertogether-loadgenerator"
+  template:
+    metadata:
+      labels:
+        app: "wandertogether-loadgenerator"
+    spec:
+      containers:
+      - name: "loadgenerator"
+        image: "gcr.io/keen-opus-470223-b7/wandertogether-loadgenerator:latest"
+        ports:
+        - containerPort: 8089
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "wandertogether-loadgenerator-service"
+  namespace: "default"
+  labels:
+    app: "wandertogether-loadgenerator"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 8089
+  selector:
+    app: "wandertogether-loadgenerator"
+  type: "LoadBalancer"
+  loadBalancerIP: ""
