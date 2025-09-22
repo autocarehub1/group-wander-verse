@@ -238,6 +238,13 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 2
+        volumeMounts:
+        - name: nginx-cache
+          mountPath: /var/cache/nginx
+        - name: nginx-run
+          mountPath: /var/run/nginx
+        - name: nginx-logs
+          mountPath: /var/log/nginx
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -246,6 +253,13 @@ spec:
           capabilities:
             drop:
             - ALL
+      volumes:
+      - name: nginx-cache
+        emptyDir: {}
+      - name: nginx-run
+        emptyDir: {}
+      - name: nginx-logs
+        emptyDir: {}
 
 ---
 apiVersion: v1
@@ -333,6 +347,11 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 2
+        volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: loadgen-home
+          mountPath: /home/loadgen
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -341,6 +360,11 @@ spec:
           capabilities:
             drop:
             - ALL
+      volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: loadgen-home
+        emptyDir: {}
 
 ---
 apiVersion: v1
