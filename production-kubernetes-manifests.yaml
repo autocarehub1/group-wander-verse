@@ -66,6 +66,8 @@ spec:
         prometheus.io/port: "5000"
         prometheus.io/path: "/metrics"
     spec:
+      imagePullSecrets:
+      - name: gcr-secret
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
@@ -190,6 +192,8 @@ spec:
         app: frontend
         tier: frontend
     spec:
+      imagePullSecrets:
+      - name: gcr-secret
       securityContext:
         runAsNonRoot: true
         runAsUser: 101  # nginx user
@@ -302,6 +306,8 @@ spec:
         app: loadgenerator
         tier: testing
     spec:
+      imagePullSecrets:
+      - name: gcr-secret
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
