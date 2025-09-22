@@ -1,24 +1,28 @@
-# Load Generator for WanderTogether Travel App
-# Based on Google Cloud microservices-demo loadgenerator pattern
+# Multi-stage load generator following 3-tier patterns
+FROM python:3.11-alpine AS base
 
-FROM python:3.11-slim
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /loadgen
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies including curl for health checks
+RUN apk add --no-cache \
     gcc \
-    && rm -rf /var/lib/apt/lists/*
+    musl-dev \
+    curl
 
-# Install Python dependencies
+# Copy requirements first for better caching
 COPY loadgenerator/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy load generator scripts
 COPY loadgenerator/ .
 
-# Create non-root user
-RUN groupadd -r loadgen && useradd -r -g loadgen loadgen
+# Create non-root user (Alpine syntax)
+RUN adduser -D -u 1001 -s /bin/sh loadgen
 RUN chown -R loadgen:loadgen /loadgen
 USER loadgen
 
@@ -26,8 +30,8 @@ USER loadgen
 EXPOSE 8089
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8089')" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8089/ || exit 1
 
 # Start Locust with web UI
-ENTRYPOINT ["locust", "--host=http://wandertogether-frontend", "--web-host=0.0.0.0", "--web-port=8089"]
+CMD ["locust", "--host=http://frontend-service", "--web-host=0.0.0.0", "--web-port=8089"]
