@@ -21,8 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy load generator scripts
 COPY loadgenerator/ .
 
-# Create non-root user (Alpine syntax)
-RUN adduser -D -u 1001 -s /bin/sh loadgen
+# Create non-root user and group (Alpine syntax)
+RUN addgroup -S loadgen && adduser -S -G loadgen -u 1001 -s /bin/sh loadgen
 RUN chown -R loadgen:loadgen /loadgen
 USER loadgen
 

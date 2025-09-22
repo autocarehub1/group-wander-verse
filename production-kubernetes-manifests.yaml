@@ -1,0 +1,415 @@
+# Production Kubernetes manifests following 3-tier architecture patterns
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wandertogether
+  labels:
+    name: wandertogether
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wandertogether-config
+  namespace: wandertogether
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  BACKEND_URL: "http://backend-service"
+  FRONTEND_URL: "http://frontend-service:8080"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wandertogether-secrets
+  namespace: wandertogether
+type: Opaque
+data:
+  # Base64 encoded secrets - replace with actual values
+  # echo -n "your-database-url" | base64
+  database-url: ""
+  # echo -n "your-sendgrid-api-key" | base64  
+  sendgrid-api-key: ""
+  # echo -n "your-anthropic-api-key" | base64
+  anthropic-api-key: ""
+  # echo -n "your-session-secret" | base64
+  session-secret: ""
+
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: wandertogether
+  labels:
+    app: backend
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: backend
+        image: gcr.io/keen-opus-470223-b7/wandertogether-backend:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: wandertogether-config
+              key: NODE_ENV
+        - name: PORT
+          value: "5000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: database-url
+              optional: true
+        - name: SENDGRID_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: sendgrid-api-key
+              optional: true
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: anthropic-api-key
+              optional: true
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: wandertogether-secrets
+              key: session-secret
+              optional: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "150m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: wandertogether
+  labels:
+    app: backend
+spec:
+  selector:
+    app: backend
+    tier: backend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  type: ClusterIP
+
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: wandertogether
+  labels:
+    app: frontend
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tier: frontend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101  # nginx user
+        fsGroup: 101
+      containers:
+      - name: frontend
+        image: gcr.io/keen-opus-470223-b7/wandertogether-frontend:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: BACKEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: wandertogether-config
+              key: BACKEND_URL
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 101
+          capabilities:
+            drop:
+            - ALL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: wandertogether
+  labels:
+    app: frontend
+spec:
+  selector:
+    app: frontend
+    tier: frontend
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: LoadBalancer
+
+---
+# Load Generator Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+  namespace: wandertogether
+  labels:
+    app: loadgenerator
+    tier: testing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgenerator
+      tier: testing
+  template:
+    metadata:
+      labels:
+        app: loadgenerator
+        tier: testing
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: loadgenerator
+        image: gcr.io/keen-opus-470223-b7/wandertogether-loadgenerator:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8089
+          name: web
+        env:
+        - name: FRONTEND_ADDR
+          value: "frontend-service:8080"
+        - name: USERS
+          value: "10"
+        - name: SPAWN_RATE
+          value: "2"
+        - name: LOCUST_WEB_PORT
+          value: "8089"
+        - name: LOCUST_HOST
+          value: "http://frontend-service:8080"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8089
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8089
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadgenerator-service
+  namespace: wandertogether
+  labels:
+    app: loadgenerator
+spec:
+  selector:
+    app: loadgenerator
+    tier: testing
+  ports:
+  - name: web
+    port: 8089
+    targetPort: 8089
+    protocol: TCP
+  type: LoadBalancer
+
+---
+# Horizontal Pod Autoscalers
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: wandertogether
+  labels:
+    app: backend
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: backend
+    apiVersion: apps/v1
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend-hpa
+  namespace: wandertogether
+  labels:
+    app: frontend
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: frontend
+    apiVersion: apps/v1
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
