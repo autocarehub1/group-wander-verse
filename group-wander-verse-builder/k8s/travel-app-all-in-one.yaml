@@ -1,0 +1,342 @@
+# Complete Kubernetes deployment for WanderVerse Builder
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wander-verse
+  labels:
+    name: wander-verse
+    purpose: travel-app-builder
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wander-verse-config
+  namespace: wander-verse
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  API_PORT: "3000"
+  BUILD_TIMEOUT: "1800"
+  MAX_CONCURRENT_BUILDS: "5"
+  STORAGE_PROVIDER: "gcs"
+  
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wander-verse-secrets
+  namespace: wander-verse
+type: Opaque
+data:
+  # Base64 encoded secrets
+  # echo -n "your-api-key" | base64
+  api-key: ""
+  # echo -n "your-gcs-key-json" | base64
+  gcs-service-account: ""
+  # echo -n "your-build-webhook-secret" | base64
+  webhook-secret: ""
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: build-cache-pvc
+  namespace: wander-verse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: build-artifacts-pvc
+  namespace: wander-verse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ssd
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wander-verse-builder
+  namespace: wander-verse
+  labels:
+    app: wander-verse-builder
+    tier: backend
+    component: build-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wander-verse-builder
+  template:
+    metadata:
+      labels:
+        app: wander-verse-builder
+        tier: backend
+        component: build-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      imagePullSecrets:
+      - name: gcr-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: builder
+        image: gcr.io/keen-opus-470223-b7/wander-verse-builder:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: wander-verse-config
+              key: NODE_ENV
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: wander-verse-config
+              key: LOG_LEVEL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: wander-verse-config
+              key: API_PORT
+        - name: BUILD_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: wander-verse-config
+              key: BUILD_TIMEOUT
+        - name: MAX_CONCURRENT_BUILDS
+          valueFrom:
+            configMapKeyRef:
+              name: wander-verse-config
+              key: MAX_CONCURRENT_BUILDS
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: wander-verse-secrets
+              key: api-key
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/secrets/gcs-key.json"
+        - name: WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: wander-verse-secrets
+              key: webhook-secret
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        volumeMounts:
+        - name: build-cache
+          mountPath: /app/cache
+        - name: build-artifacts
+          mountPath: /app/artifacts
+        - name: logs
+          mountPath: /app/logs
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: gcs-secret
+          mountPath: /secrets
+          readOnly: true
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: build-cache
+        persistentVolumeClaim:
+          claimName: build-cache-pvc
+      - name: build-artifacts
+        persistentVolumeClaim:
+          claimName: build-artifacts-pvc
+      - name: logs
+        emptyDir: {}
+      - name: tmp-dir
+        emptyDir: {}
+      - name: gcs-secret
+        secret:
+          secretName: wander-verse-secrets
+          items:
+          - key: gcs-service-account
+            path: gcs-key.json
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wander-verse-builder-service
+  namespace: wander-verse
+  labels:
+    app: wander-verse-builder
+spec:
+  selector:
+    app: wander-verse-builder
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wander-verse-builder-lb
+  namespace: wander-verse
+  labels:
+    app: wander-verse-builder
+    service-type: loadbalancer
+spec:
+  selector:
+    app: wander-verse-builder
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  type: LoadBalancer
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: wander-verse-builder-hpa
+  namespace: wander-verse
+  labels:
+    app: wander-verse-builder
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: wander-verse-builder
+    apiVersion: apps/v1
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: wander-verse-network-policy
+  namespace: wander-verse
+spec:
+  podSelector:
+    matchLabels:
+      app: wander-verse-builder
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - namespaceSelector:
+        matchLabels:
+          name: default
+    - namespaceSelector:
+        matchLabels:
+          name: wander-verse
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  - {} # Allow all outbound traffic for API calls
+
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: wander-verse-builder-monitor
+  namespace: wander-verse
+  labels:
+    app: wander-verse-builder
+spec:
+  selector:
+    matchLabels:
+      app: wander-verse-builder
+  endpoints:
+  - port: http
+    interval: 30s
+    path: /metrics
