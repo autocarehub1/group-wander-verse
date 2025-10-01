@@ -27,6 +27,7 @@ const Profile = () => {
     togglePreference,
     toggleDietaryRestriction,
     toggleAccessibilityNeed,
+    refetchProfile,
   } = useProfile();
 
   const handleLogout = async () => {
@@ -118,6 +119,7 @@ const Profile = () => {
                 }
                 setProfile={setProfile}
                 updateProfile={updateProfile}
+                refetchProfile={refetchProfile}
               />
             </TabsContent>
 

@@ -28,9 +28,10 @@ interface PersonalInfoTabProps {
   profile: UserProfile;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  refetchProfile: () => Promise<void>;
 }
 
-export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: PersonalInfoTabProps) => {
+export const PersonalInfoTab = ({ profile, setProfile, updateProfile, refetchProfile }: PersonalInfoTabProps) => {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
@@ -98,9 +99,10 @@ export const PersonalInfoTab = ({ profile, setProfile, updateProfile }: Personal
 
       if (response.ok) {
         const result = await response.json();
-        setFormData(prev => ({ ...prev, avatar_url: result.avatar_url }));
-        // Update the profile with the new avatar URL to trigger re-render
-        setProfile(prev => prev ? { ...prev, avatar_url: result.avatar_url } : null);
+        
+        // Refetch the profile from the server to get the latest avatar URL
+        await refetchProfile();
+        
         toast({
           title: "Avatar updated",
           description: "Your profile picture has been updated successfully.",

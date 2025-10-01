@@ -154,6 +154,7 @@ export const useProfile = () => {
     updateProfile,
     togglePreference,
     toggleDietaryRestriction,
-    toggleAccessibilityNeed
+    toggleAccessibilityNeed,
+    refetchProfile: fetchProfile
   };
 };
