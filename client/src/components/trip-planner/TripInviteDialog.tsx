@@ -18,6 +18,7 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
   const [isInviting, setIsInviting] = useState(false);
+  const [shareableLink, setShareableLink] = useState<string>('');
   const { toast } = useToast();
 
   const handleInviteByEmail = async () => {
@@ -134,15 +135,16 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
       const data = await response.json();
       const shareUrl = `${window.location.origin}/join/${data.invitation_token}`;
       
+      // Store the link to display
+      setShareableLink(shareUrl);
+      
       // Copy to clipboard
       await navigator.clipboard.writeText(shareUrl);
       
       toast({
-        title: "Shareable link created!",
-        description: "Link has been copied to clipboard and can be shared anywhere."
+        title: "Link copied!",
+        description: "Invitation link has been copied to your clipboard."
       });
-
-      setIsOpen(false);
     } catch (error: any) {
       toast({
         title: "Error creating link",
@@ -151,6 +153,23 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
       });
     } finally {
       setIsInviting(false);
+    }
+  };
+
+  const copyLinkToClipboard = async () => {
+    if (shareableLink) {
+      await navigator.clipboard.writeText(shareableLink);
+      toast({
+        title: "Copied!",
+        description: "Link copied to clipboard."
+      });
+    }
+  };
+
+  const shareViaWhatsApp = () => {
+    if (shareableLink) {
+      const text = `Join me on an amazing trip! Click here: ${shareableLink}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
   };
 
@@ -296,8 +315,20 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="email" className="w-full">
+        <Tabs defaultValue="link" className="w-full">
           <TabsList className="grid w-full grid-cols-5 text-xs">
+            <TabsTrigger value="link" className="gap-1">
+              <Link className="h-3 w-3" />
+              <span className="hidden sm:inline">Link</span>
+            </TabsTrigger>
+            <TabsTrigger value="social" className="gap-1">
+              <Share2 className="h-3 w-3" />
+              <span className="hidden sm:inline">Share</span>
+            </TabsTrigger>
+            <TabsTrigger value="qr" className="gap-1">
+              <QrCode className="h-3 w-3" />
+              <span className="hidden sm:inline">QR</span>
+            </TabsTrigger>
             <TabsTrigger value="email" className="gap-1">
               <Mail className="h-3 w-3" />
               <span className="hidden sm:inline">Email</span>
@@ -305,18 +336,6 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
             <TabsTrigger value="phone" className="gap-1">
               <Phone className="h-3 w-3" />
               <span className="hidden sm:inline">SMS</span>
-            </TabsTrigger>
-            <TabsTrigger value="link" className="gap-1">
-              <Link className="h-3 w-3" />
-              <span className="hidden sm:inline">Link</span>
-            </TabsTrigger>
-            <TabsTrigger value="qr" className="gap-1">
-              <QrCode className="h-3 w-3" />
-              <span className="hidden sm:inline">QR</span>
-            </TabsTrigger>
-            <TabsTrigger value="social" className="gap-1">
-              <Share2 className="h-3 w-3" />
-              <span className="hidden sm:inline">Share</span>
             </TabsTrigger>
           </TabsList>
           
@@ -381,24 +400,105 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
           </TabsContent>
           
           <TabsContent value="link" className="space-y-4 mt-4">
-            <div className="text-center space-y-4">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto bg-primary/10 rounded-full">
-                <Copy className="h-8 w-8 text-primary" />
+            {!shareableLink ? (
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-primary/10 rounded-full">
+                  <Copy className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Create Shareable Link</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Generate a link that can be shared via any messaging app. Anyone with this link can join the trip.
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleCreateShareableLink} 
+                  className="w-full" 
+                  disabled={isInviting}
+                  data-testid="button-generate-link"
+                >
+                  {isInviting ? "Creating..." : "Generate Invitation Link"}
+                </Button>
               </div>
-              <div>
-                <h3 className="font-semibold">Create Shareable Link</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Generate a link that can be shared via any platform. Anyone with this link can join the trip.
-                </p>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-center mb-3">Your Invitation Link is Ready!</h3>
+                  <div className="flex gap-2 items-center p-3 bg-muted rounded-lg">
+                    <Input 
+                      value={shareableLink} 
+                      readOnly 
+                      className="flex-1 bg-background"
+                      data-testid="input-shareable-link"
+                    />
+                    <Button 
+                      size="icon" 
+                      variant="outline"
+                      onClick={copyLinkToClipboard}
+                      data-testid="button-copy-link"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground text-center mb-3">Share instantly via:</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={shareViaWhatsApp}
+                      data-testid="button-share-whatsapp"
+                    >
+                      <MessageCircle className="h-4 w-4 text-green-600" />
+                      WhatsApp
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => {
+                        const text = `Join me on an amazing trip! ${shareableLink}`;
+                        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareableLink)}&text=${encodeURIComponent('Join me on an amazing trip!')}`, '_blank');
+                      }}
+                      data-testid="button-share-telegram"
+                    >
+                      <MessageCircle className="h-4 w-4 text-blue-500" />
+                      Telegram
+                    </Button>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full gap-2"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: 'Join My Trip!',
+                        text: 'Join me on an amazing trip!',
+                        url: shareableLink,
+                      });
+                    } else {
+                      copyLinkToClipboard();
+                    }
+                  }}
+                  data-testid="button-share-more"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share via More Apps
+                </Button>
+
+                <Button 
+                  variant="ghost" 
+                  className="w-full"
+                  onClick={() => setShareableLink('')}
+                  data-testid="button-create-new-link"
+                >
+                  Create New Link
+                </Button>
               </div>
-              <Button 
-                onClick={handleCreateShareableLink} 
-                className="w-full" 
-                disabled={isInviting}
-              >
-                {isInviting ? "Creating..." : "Generate & Copy Link"}
-              </Button>
-            </div>
+            )}
           </TabsContent>
           
           <TabsContent value="qr" className="space-y-4 mt-4">
