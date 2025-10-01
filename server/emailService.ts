@@ -1,14 +1,45 @@
 import { Resend } from 'resend';
 
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY environment variable must be set");
+let connectionSettings: any;
+
+async function getCredentials() {
+  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
+  const xReplitToken = process.env.REPL_IDENTITY 
+    ? 'repl ' + process.env.REPL_IDENTITY 
+    : process.env.WEB_REPL_RENEWAL 
+    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+    : null;
+
+  if (!xReplitToken) {
+    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
+  }
+
+  connectionSettings = await fetch(
+    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=resend',
+    {
+      headers: {
+        'Accept': 'application/json',
+        'X_REPLIT_TOKEN': xReplitToken
+      }
+    }
+  ).then(res => res.json()).then(data => data.items?.[0]);
+
+  if (!connectionSettings || (!connectionSettings.settings.api_key)) {
+    throw new Error('Resend not connected');
+  }
+  return {apiKey: connectionSettings.settings.api_key, fromEmail: connectionSettings.settings.from_email};
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+async function getUncachableResendClient() {
+  const credentials = await getCredentials();
+  return {
+    client: new Resend(credentials.apiKey),
+    fromEmail: connectionSettings.settings.from_email
+  };
+}
 
 interface EmailParams {
   to: string;
-  from: string;
   subject: string;
   text?: string;
   html?: string;
@@ -16,9 +47,11 @@ interface EmailParams {
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
+    const { client, fromEmail } = await getUncachableResendClient();
+    
     const emailData: any = {
       to: params.to,
-      from: params.from,
+      from: fromEmail,
       subject: params.subject,
     };
     
@@ -27,11 +60,11 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     
     console.log('Attempting to send email with Resend:', {
       to: params.to,
-      from: params.from,
+      from: fromEmail,
       subject: params.subject
     });
     
-    const result = await resend.emails.send(emailData);
+    const result = await client.emails.send(emailData);
     
     console.log('Resend API response:', result);
     
@@ -117,15 +150,11 @@ This invitation will expire in 7 days.
 ---
 WanderTogether - Collaborative Trip Planning
   `;
-
-  // Use a verified email address for Resend
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
   
   console.log(`Sending invitation email to ${recipientEmail} for trip "${tripTitle}"`);
   
   const emailSent = await sendEmail({
     to: recipientEmail,
-    from: fromEmail,
     subject,
     text: textContent,
     html: htmlContent
