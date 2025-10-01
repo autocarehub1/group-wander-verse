@@ -13,8 +13,13 @@ import { z } from "zod";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), 'uploads', 'payment-proofs');
+const avatarDir = path.join(process.cwd(), 'uploads', 'avatars');
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+}
+if (!fs.existsSync(avatarDir)) {
+  fs.mkdirSync(avatarDir, { recursive: true });
 }
 
 const upload = multer({
@@ -35,6 +40,27 @@ const upload = multer({
   },
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Configure multer for avatar uploads
+const avatarUpload = multer({
+  storage: multer.diskStorage({
+    destination: avatarDir,
+    filename: (req, file, cb) => {
+      const uniqueName = `${req.params.id}_${Date.now()}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit for avatars
   }
 });
 
@@ -63,6 +89,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         break;
       case '.webp':
         contentType = 'image/webp';
+        break;
+    }
+    
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.sendFile(filePath);
+  });
+
+  // Serve uploaded avatar images
+  app.get('/api/uploads/avatars/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(avatarDir, filename);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    // Set appropriate headers for image files
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = 'application/octet-stream';
+    
+    switch (ext) {
+      case '.jpg':
+      case '.jpeg':
+        contentType = 'image/jpeg';
+        break;
+      case '.png':
+        contentType = 'image/png';
+        break;
+      case '.webp':
+        contentType = 'image/webp';
+        break;
+      case '.gif':
+        contentType = 'image/gif';
         break;
     }
     
@@ -135,12 +195,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Avatar upload endpoint
-  app.post("/api/users/:id/avatar", async (req, res) => {
+  app.post("/api/users/:id/avatar", avatarUpload.single('avatar'), async (req: Request & { file?: Express.Multer.File }, res) => {
     try {
-      // For production readiness, generate a unique avatar URL
-      // In a real deployment, this would upload to cloud storage
-      const timestamp = Date.now();
-      const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${req.params.id}-${timestamp}&backgroundColor=random`;
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      // Create the avatar URL pointing to our uploaded file
+      const avatarUrl = `/api/uploads/avatars/${req.file.filename}`;
       
       // Update user's avatar URL in database
       const updatedUser = await storage.updateUser(req.params.id, { avatar_url: avatarUrl });

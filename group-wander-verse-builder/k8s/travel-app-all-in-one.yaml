@@ -1,158 +1,222 @@
-# Complete Kubernetes deployment for WanderVerse Builder
----
+
+# k8s/travel-app-all-in-one.yaml
+# Complete Kubernetes deployment for Group Wander Verse Build Service
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: wander-verse
+  name: wanderverse-builds
   labels:
-    name: wander-verse
-    purpose: travel-app-builder
-    pod-security.kubernetes.io/enforce: restricted
-    pod-security.kubernetes.io/audit: restricted
-    pod-security.kubernetes.io/warn: restricted
+    name: wanderverse-builds
+    app: group-wander-verse
+    purpose: travel-app-builds
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wander-verse-config
-  namespace: wander-verse
+  name: wanderverse-config
+  namespace: wanderverse-builds
+  labels:
+    app: wanderverse-builder
 data:
   NODE_ENV: "production"
+  BUILD_ENV: "production"
   LOG_LEVEL: "info"
-  API_PORT: "3000"
-  BUILD_TIMEOUT: "1800"
-  MAX_CONCURRENT_BUILDS: "5"
-  STORAGE_PROVIDER: "gcs"
-  
+  BUILD_TIMEOUT: "1800000"
+  MAX_CONCURRENT_BUILDS: "2"
+  BUILD_RETENTION_DAYS: "7"
+  ARTIFACTS_PATH: "/app/artifacts"
+
+  # Travel App Specific Configuration
+  APP_NAME: "Group Wander Verse"
+  APP_TYPE: "travel-app"
+  SUPPORTED_PLATFORMS: "android,ios,expo"
+
+  # Android Configuration for Travel App
+  ANDROID_COMPILE_SDK_VERSION: "33"
+  ANDROID_BUILD_TOOLS_VERSION: "33.0.2"
+  ANDROID_MIN_SDK_VERSION: "21"
+  ANDROID_TARGET_SDK_VERSION: "33"
+
+  # React Native Configuration
+  RN_VERSION: "0.72.0"
+  EXPO_SDK_VERSION: "49.0.0"
+
+  # Travel Features Configuration
+  GOOGLE_MAPS_ENABLED: "true"
+  PAYMENT_PROVIDERS: "stripe,paypal"
+  NOTIFICATION_PROVIDERS: "firebase,onesignal"
+
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: wander-verse-secrets
-  namespace: wander-verse
+  name: wanderverse-secrets
+  namespace: wanderverse-builds
+  labels:
+    app: wanderverse-builder
 type: Opaque
-data:
-  # Base64 encoded secrets
-  # echo -n "your-api-key" | base64
-  api-key: ""
-  # echo -n "your-gcs-key-json" | base64
-  gcs-service-account: ""
-  # echo -n "your-build-webhook-secret" | base64
-  webhook-secret: ""
+stringData:
+  # API Keys for Travel App Integration
+  google-maps-api-key: "your-google-maps-api-key"
+  stripe-publishable-key: "your-stripe-publishable-key"
+  stripe-secret-key: "your-stripe-secret-key"
+  firebase-api-key: "your-firebase-api-key"
+  firebase-project-id: "your-firebase-project-id"
+
+  # Build Service Authentication
+  jwt-secret: "your-jwt-secret-for-build-auth"
+  api-key: "your-secure-api-key"
+
+  # GitHub Integration
+  github-token: "your-github-personal-access-token"
+  github-webhook-secret: "your-webhook-secret"
+
+  # Android Signing (Base64 encoded)
+  android-keystore: "base64-encoded-keystore-file"
+  android-keystore-password: "your-keystore-password"
+  android-key-alias: "your-key-alias"
+  android-key-password: "your-key-password"
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: build-cache-pvc
-  namespace: wander-verse
+  name: wanderverse-artifacts-pvc
+  namespace: wanderverse-builds
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
-  storageClassName: ssd
+      storage: 50Gi  # Larger storage for travel app builds with maps/assets
+  storageClassName: standard-rwo
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: build-artifacts-pvc
-  namespace: wander-verse
+  name: wanderverse-cache-pvc
+  namespace: wanderverse-builds
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 50Gi
-  storageClassName: ssd
+      storage: 20Gi  # Cache for dependencies and build tools
+  storageClassName: standard-rwo
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wander-verse-builder
-  namespace: wander-verse
+  name: wanderverse-builder
+  namespace: wanderverse-builds
   labels:
-    app: wander-verse-builder
-    tier: backend
-    component: build-service
+    app: wanderverse-builder
+    version: v1
 spec:
-  replicas: 2
+  replicas: 1  # Start with 1, can be scaled based on demand
   selector:
     matchLabels:
-      app: wander-verse-builder
+      app: wanderverse-builder
   template:
     metadata:
       labels:
-        app: wander-verse-builder
-        tier: backend
-        component: build-service
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "3000"
-        prometheus.io/path: "/metrics"
+        app: wanderverse-builder
+        version: v1
     spec:
-      imagePullSecrets:
-      - name: gcr-secret
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1001
-        fsGroup: 1001
       containers:
       - name: builder
-        image: gcr.io/keen-opus-470223-b7/wander-verse-builder:v1.0.0
-        imagePullPolicy: IfNotPresent
+        image: gcr.io/PROJECT_ID_PLACEHOLDER/wanderverse-builder:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
           name: http
+        resources:
+          requests:
+            memory: "1Gi"      # Increased for travel app builds
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "4Gi"      # Higher limit for complex travel app builds
+            cpu: "2000m"       # 2 CPU cores for faster builds
+            ephemeral-storage: "10Gi"
+
+        # Environment variables from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: wanderverse-config
+
+        # Sensitive environment variables from Secret
         env:
-        - name: NODE_ENV
+        - name: GOOGLE_MAPS_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: wander-verse-config
-              key: NODE_ENV
-        - name: LOG_LEVEL
+            secretKeyRef:
+              name: wanderverse-secrets
+              key: google-maps-api-key
+        - name: STRIPE_PUBLISHABLE_KEY
           valueFrom:
-            configMapKeyRef:
-              name: wander-verse-config
-              key: LOG_LEVEL
-        - name: PORT
+            secretKeyRef:
+              name: wanderverse-secrets
+              key: stripe-publishable-key
+        - name: FIREBASE_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: wander-verse-config
-              key: API_PORT
-        - name: BUILD_TIMEOUT
+            secretKeyRef:
+              name: wanderverse-secrets
+              key: firebase-api-key
+        - name: JWT_SECRET
           valueFrom:
-            configMapKeyRef:
-              name: wander-verse-config
-              key: BUILD_TIMEOUT
-        - name: MAX_CONCURRENT_BUILDS
-          valueFrom:
-            configMapKeyRef:
-              name: wander-verse-config
-              key: MAX_CONCURRENT_BUILDS
+            secretKeyRef:
+              name: wanderverse-secrets
+              key: jwt-secret
         - name: API_KEY
           valueFrom:
             secretKeyRef:
-              name: wander-verse-secrets
+              name: wanderverse-secrets
               key: api-key
-        - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: "/secrets/gcs-key.json"
-        - name: WEBHOOK_SECRET
+        - name: GITHUB_TOKEN
           valueFrom:
             secretKeyRef:
-              name: wander-verse-secrets
-              key: webhook-secret
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
+              name: wanderverse-secrets
+              key: github-token
+        - name: ANDROID_KEYSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wanderverse-secrets
+              key: android-keystore-password
+
+        # Volume mounts for persistent storage
+        volumeMounts:
+        - name: artifacts-storage
+          mountPath: /app/artifacts
+        - name: cache-storage
+          mountPath: /app/cache
+        - name: build-cache
+          mountPath: /app/build-cache
+        - name: android-sdk-cache
+          mountPath: /opt/android-sdk-cache
+
+        # Health checks optimized for travel app builds
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 3000
+          initialDelaySeconds: 90    # Longer startup time for travel app
+          periodSeconds: 30
+          timeoutSeconds: 15
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 3
+
         startupProbe:
           httpGet:
             path: /health
@@ -160,113 +224,106 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-          failureThreshold: 6
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 2
-        volumeMounts:
-        - name: build-cache
-          mountPath: /app/cache
-        - name: build-artifacts
-          mountPath: /app/artifacts
-        - name: logs
-          mountPath: /app/logs
-        - name: tmp-dir
-          mountPath: /tmp
-        - name: gcs-secret
-          mountPath: /secrets
-          readOnly: true
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1001
-          capabilities:
-            drop:
-            - ALL
+          failureThreshold: 18        # 3 minutes for startup
+
       volumes:
+      - name: artifacts-storage
+        persistentVolumeClaim:
+          claimName: wanderverse-artifacts-pvc
+      - name: cache-storage
+        persistentVolumeClaim:
+          claimName: wanderverse-cache-pvc
       - name: build-cache
-        persistentVolumeClaim:
-          claimName: build-cache-pvc
-      - name: build-artifacts
-        persistentVolumeClaim:
-          claimName: build-artifacts-pvc
-      - name: logs
-        emptyDir: {}
-      - name: tmp-dir
-        emptyDir: {}
-      - name: gcs-secret
-        secret:
-          secretName: wander-verse-secrets
-          items:
-          - key: gcs-service-account
-            path: gcs-key.json
+        emptyDir:
+          sizeLimit: 5Gi
+      - name: android-sdk-cache
+        emptyDir:
+          sizeLimit: 3Gi
+
+      # Use preemptible nodes for cost savings
+      nodeSelector:
+        cloud.google.com/gke-preemptible: "true"
+
+      tolerations:
+      - key: "preemptible"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+      # Graceful shutdown for builds in progress
+      terminationGracePeriodSeconds: 300  # 5 minutes to finish builds
+
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: wander-verse-builder-service
-  namespace: wander-verse
+  name: wanderverse-builder-service
+  namespace: wanderverse-builds
   labels:
-    app: wander-verse-builder
+    app: wanderverse-builder
 spec:
   selector:
-    app: wander-verse-builder
+    app: wanderverse-builder
   ports:
   - name: http
     port: 80
     targetPort: 3000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
     protocol: TCP
   type: ClusterIP
 
 ---
-apiVersion: v1
-kind: Service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: wander-verse-builder-lb
-  namespace: wander-verse
+  name: wanderverse-builder-ingress
+  namespace: wanderverse-builds
   labels:
-    app: wander-verse-builder
-    service-type: loadbalancer
+    app: wanderverse-builder
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "wanderverse-builder-ip"
+    ingress.gcp.kubernetes.io/managed-certificates: "wanderverse-ssl-cert"
+    kubernetes.io/ingress.allow-http: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"  # Allow large file uploads
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"  # 30 min timeout for builds
 spec:
-  selector:
-    app: wander-verse-builder
-  ports:
-  - name: http
-    port: 80
-    targetPort: 3000
-    protocol: TCP
-  type: LoadBalancer
+  rules:
+  - host: builder.wanderverse.app  # Change to your domain
+    http:
+      paths:
+      - path: "/*"
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: wanderverse-builder-service
+            port:
+              number: 80
 
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: wander-verse-builder-hpa
-  namespace: wander-verse
+  name: wanderverse-builder-hpa
+  namespace: wanderverse-builds
   labels:
-    app: wander-verse-builder
+    app: wanderverse-builder
 spec:
   scaleTargetRef:
-    kind: Deployment
-    name: wander-verse-builder
     apiVersion: apps/v1
-  minReplicas: 2
-  maxReplicas: 10
+    kind: Deployment
+    name: wanderverse-builder
+  minReplicas: 1
+  maxReplicas: 3  # Limited for cost control
   metrics:
   - type: Resource
     resource:
@@ -281,29 +338,62 @@ spec:
         type: Utilization
         averageUtilization: 80
   behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600  # 10 minutes before scaling down
+      policies:
+      - type: Percent
+        value: 25
+        periodSeconds: 60
     scaleUp:
-      stabilizationWindowSeconds: 60
+      stabilizationWindowSeconds: 120  # 2 minutes before scaling up
       policies:
       - type: Percent
         value: 100
-        periodSeconds: 15
-    scaleDown:
-      stabilizationWindowSeconds: 300
-      policies:
-      - type: Percent
-        value: 10
         periodSeconds: 60
 
 ---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wanderverse-cleanup
+  namespace: wanderverse-builds
+  labels:
+    app: wanderverse-builder
+spec:
+  schedule: "0 2 * * *"  # Run daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cleanup
+            image: gcr.io/PROJECT_ID_PLACEHOLDER/wanderverse-builder:latest
+            command: ["/bin/bash", "-c"]
+            args:
+            - |
+              echo "Starting cleanup of old travel app builds..."
+              # Cleanup logic would be implemented here
+              # This could call an API endpoint or run cleanup directly
+              curl -X POST http://wanderverse-builder-service/api/v1/admin/cleanup
+            env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wanderverse-secrets
+                  key: api-key
+          restartPolicy: OnFailure
+
+---
+# Network Policy for security
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: wander-verse-network-policy
-  namespace: wander-verse
+  name: wanderverse-builder-netpol
+  namespace: wanderverse-builds
 spec:
   podSelector:
     matchLabels:
-      app: wander-verse-builder
+      app: wanderverse-builder
   policyTypes:
   - Ingress
   - Egress
@@ -312,31 +402,9 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: kube-system
-    - namespaceSelector:
-        matchLabels:
-          name: default
-    - namespaceSelector:
-        matchLabels:
-          name: wander-verse
+    - podSelector: {}
     ports:
     - protocol: TCP
       port: 3000
   egress:
-  - {} # Allow all outbound traffic for API calls
-
----
-apiVersion: v1
-kind: ServiceMonitor
-metadata:
-  name: wander-verse-builder-monitor
-  namespace: wander-verse
-  labels:
-    app: wander-verse-builder
-spec:
-  selector:
-    matchLabels:
-      app: wander-verse-builder
-  endpoints:
-  - port: http
-    interval: 30s
-    path: /metrics
+  - {}  # Allow all outbound traffic for API calls, downloads, etc.

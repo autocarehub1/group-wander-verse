@@ -1,54 +1,69 @@
 {
   "name": "group-wander-verse-builder",
   "version": "1.0.0",
-  "description": "Travel app build service for React Native applications",
+  "description": "Mobile app build service for Group Wander Verse travel application",
   "main": "server.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "npm run build:travel-app",
+    "build:travel-app": "./build-scripts/travel-app-build.sh",
+    "build:android": "./build-scripts/android-travel-build.sh",
+    "build:ios": "./build-scripts/ios-travel-build.sh",
+    "build:expo": "expo build:android && expo build:ios",
     "test": "jest",
-    "lint": "eslint src/**/*.{js,ts}",
-    "docker:build": "docker build -t wander-verse-builder .",
-    "k8s:deploy": "kubectl apply -f k8s/"
+    "test:watch": "jest --watch",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "docker:build": "docker build -t wanderverse-builder .",
+    "docker:run": "docker run -p 3000:3000 wanderverse-builder",
+    "deploy:staging": "./scripts/deploy-staging.sh",
+    "deploy:production": "./scripts/deploy-production.sh"
   },
-  "keywords": [
-    "travel",
-    "react-native",
-    "build-service",
-    "kubernetes",
-    "microservice"
-  ],
-  "author": "WanderVerse Team",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "helmet": "^7.0.0",
     "morgan": "^1.10.0",
     "dotenv": "^16.3.1",
-    "@google-cloud/storage": "^7.0.1",
-    "multer": "^1.4.5-lts.1",
-    "joi": "^17.9.2",
     "winston": "^3.10.0",
-    "compression": "^1.7.4",
-    "rate-limiter-flexible": "^2.4.2"
+    "joi": "^17.9.2",
+    "uuid": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
+    "archiver": "^6.0.1",
+    "node-fetch": "^2.7.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
-    "typescript": "^5.1.6",
-    "tsx": "^3.12.7",
-    "@types/node": "^20.4.5",
-    "@types/express": "^4.17.17",
-    "@types/cors": "^2.8.13",
-    "@types/morgan": "^1.9.4",
-    "@types/multer": "^1.4.7",
-    "@types/compression": "^1.7.2",
     "jest": "^29.6.2",
+    "nodemon": "^3.0.1",
     "eslint": "^8.45.0",
-    "nodemon": "^3.0.1"
+    "supertest": "^6.3.3",
+    "@types/node": "^20.5.0"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
-  }
+  },
+  "keywords": [
+    "travel-app",
+    "wander-verse",
+    "react-native",
+    "expo",
+    "mobile-build",
+    "gke",
+    "kubernetes",
+    "ci-cd",
+    "travel-tech"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/autocarehub1/group-wander-verse.git"
+  },
+  "author": "AutoCareHub1",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/autocarehub1/group-wander-verse/issues"
+  },
+  "homepage": "https://github.com/autocarehub1/group-wander-verse#readme"
 }
