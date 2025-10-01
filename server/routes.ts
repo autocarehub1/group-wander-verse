@@ -380,7 +380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               tripTitle: trip.title,
               tripDestination: trip.destination,
               inviterName: inviter.full_name || inviter.email || 'Someone',
-              invitationToken: invitation.invitation_token,
+              invitationToken: invitation.invitation_token || '',
               customMessage: invitation.message || undefined
             });
             
@@ -408,7 +408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               tripTitle: trip.title,
               tripDestination: trip.destination,
               inviterName: inviter.full_name || inviter.email || 'Someone',
-              invitationToken: invitation.invitation_token,
+              invitationToken: invitation.invitation_token || '',
               customMessage: invitation.message || undefined
             });
             
@@ -768,7 +768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const analysis = {
         expenses,
         activities: activities.filter((a: any) => a.status === 'approved' || a.status === 'suggested'),
-        tripBudget: trip?.budget || 5000, // Default budget if not set
+        tripBudget: 5000, // Default budget
         categories: [
           'accommodation', 'food', 'transportation', 'activities', 
           'shopping', 'entertainment', 'other'
@@ -1555,7 +1555,7 @@ Happy travels!
         } else {
           throw new Error('No valid JSON object found in response');
         }
-      } catch (parseError) {
+      } catch (parseError: any) {
         console.error('Failed to parse AI response:', parseError);
         console.error('Full AI Response:', JSON.stringify(data, null, 2));
         console.error('AI Response content:', content);
@@ -1588,6 +1588,9 @@ Happy travels!
     } catch (error: any) {
       console.error('Error generating suggestions:', error);
       
+      // Get destination from request body
+      const { destination } = req.body;
+      
       // Handle specific API errors gracefully and provide fallback suggestions
       if (error.message?.includes('Too Many Requests') || 
           error.message?.includes('temporarily unavailable') ||
@@ -1610,7 +1613,6 @@ Happy travels!
       }
       
       // Provide fallback suggestions for other errors
-      const { destination } = req.body;
       const fallbackSuggestions = {
         activities: [
           {
