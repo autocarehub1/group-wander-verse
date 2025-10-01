@@ -1,11 +1,10 @@
-import { MailService } from '@sendgrid/mail';
+import { Resend } from 'resend';
 
-if (!process.env.SENDGRID_API_KEY) {
-  throw new Error("SENDGRID_API_KEY environment variable must be set");
+if (!process.env.RESEND_API_KEY) {
+  throw new Error("RESEND_API_KEY environment variable must be set");
 }
 
-const mailService = new MailService();
-mailService.setApiKey(process.env.SENDGRID_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface EmailParams {
   to: string;
@@ -26,10 +25,10 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     if (params.text) emailData.text = params.text;
     if (params.html) emailData.html = params.html;
     
-    await mailService.send(emailData);
+    await resend.emails.send(emailData);
     return true;
   } catch (error) {
-    console.error('SendGrid email error:', error);
+    console.error('Resend email error:', error);
     return false;
   }
 }
@@ -104,8 +103,8 @@ This invitation will expire in 7 days.
 WanderTogether - Collaborative Trip Planning
   `;
 
-  // Use a verified email address for SendGrid
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@replit.app';
+  // Use a verified email address for Resend
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
   
   console.log(`Sending invitation email to ${recipientEmail} for trip "${tripTitle}"`);
   
