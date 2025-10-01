@@ -133,7 +133,8 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
       }
 
       const data = await response.json();
-      const shareUrl = `${window.location.origin}/join/${data.invitation_token}`;
+      const baseUrl = import.meta.env.VITE_BASE_URL || window.location.origin;
+      const shareUrl = `${baseUrl}/join/${data.invitation_token}`;
       
       // Store the link to display
       setShareableLink(shareUrl);
@@ -191,7 +192,8 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
       }
 
       const data = await response.json();
-      const shareUrl = `${window.location.origin}/join/${data.invitation_token}`;
+      const baseUrl = import.meta.env.VITE_BASE_URL || window.location.origin;
+      const shareUrl = `${baseUrl}/join/${data.invitation_token}`;
       
       // Generate QR code URL using QR Server API
       const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
@@ -237,7 +239,8 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
       }
 
       const data = await response.json();
-      const shareUrl = `${window.location.origin}/join/${data.invitation_token}`;
+      const baseUrl = import.meta.env.VITE_BASE_URL || window.location.origin;
+      const shareUrl = `${baseUrl}/join/${data.invitation_token}`;
       const shareText = `Join me on an amazing trip! Click here to join our group: ${shareUrl}`;
       
       let platformUrl = '';

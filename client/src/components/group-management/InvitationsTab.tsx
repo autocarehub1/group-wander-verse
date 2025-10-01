@@ -125,7 +125,8 @@ export const InvitationsTab = ({ tripId }: InvitationsTabProps) => {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/join/${invitation.invitation_token}`;
+                        const baseUrl = import.meta.env.VITE_BASE_URL || window.location.origin;
+                        const shareUrl = `${baseUrl}/join/${invitation.invitation_token}`;
                         navigator.clipboard.writeText(shareUrl);
                         toast({
                           title: "Link copied",

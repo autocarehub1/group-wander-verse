@@ -169,7 +169,8 @@ export const useInvitations = (tripId?: string) => {
       }
 
       const data = await response.json();
-      const shareUrl = `${window.location.origin}/join/${data.invitation_token}`;
+      const baseUrl = import.meta.env.VITE_BASE_URL || window.location.origin;
+      const shareUrl = `${baseUrl}/join/${data.invitation_token}`;
       
       toast({
         title: "Shareable link created",
