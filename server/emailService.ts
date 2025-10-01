@@ -25,10 +25,25 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     if (params.text) emailData.text = params.text;
     if (params.html) emailData.html = params.html;
     
-    await resend.emails.send(emailData);
+    console.log('Attempting to send email with Resend:', {
+      to: params.to,
+      from: params.from,
+      subject: params.subject
+    });
+    
+    const result = await resend.emails.send(emailData);
+    
+    console.log('Resend API response:', result);
+    
+    if (result.error) {
+      console.error('Resend returned error:', result.error);
+      return false;
+    }
+    
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Resend email error:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     return false;
   }
 }
