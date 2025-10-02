@@ -248,7 +248,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTripInvitation(invitation: InsertTripInvitation): Promise<TripInvitation> {
-    const result = await db.insert(trip_invitations).values(invitation).returning();
+    const invitationData = {
+      ...invitation,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+    };
+    const result = await db.insert(trip_invitations).values(invitationData).returning();
     return result[0];
   }
 
