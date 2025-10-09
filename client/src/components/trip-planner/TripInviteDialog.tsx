@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Mail, Phone, Link, Copy, QrCode, Share2, MessageCircle } from 'lucide-react';
+import { UserPlus, Link, Copy, QrCode, Share2, MessageCircle } from 'lucide-react';
 
 interface TripInviteDialogProps {
   tripId: string;
@@ -14,106 +12,9 @@ interface TripInviteDialogProps {
 
 export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [message, setMessage] = useState('');
   const [isInviting, setIsInviting] = useState(false);
   const [shareableLink, setShareableLink] = useState<string>('');
   const { toast } = useToast();
-
-  const handleInviteByEmail = async () => {
-    if (!email.trim()) {
-      toast({
-        title: "Email required",
-        description: "Please enter an email address",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsInviting(true);
-    try {
-      const response = await fetch(`/api/trips/${tripId}/invitations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          invite_type: 'email',
-          invite_value: email.trim(),
-          message: message.trim() || undefined
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send invitation');
-      }
-
-      toast({
-        title: "Invitation sent!",
-        description: `An invitation has been sent to ${email.trim()}`
-      });
-
-      setEmail('');
-      setMessage('');
-      setIsOpen(false);
-    } catch (error: any) {
-      toast({
-        title: "Error sending invitation",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsInviting(false);
-    }
-  };
-
-  const handleInviteByPhone = async () => {
-    if (!phone.trim()) {
-      toast({
-        title: "Phone number required",
-        description: "Please enter a phone number",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsInviting(true);
-    try {
-      const response = await fetch(`/api/trips/${tripId}/invitations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          invite_type: 'phone',
-          invite_value: phone.trim(),
-          message: message.trim() || undefined
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send invitation');
-      }
-
-      toast({
-        title: "Invitation sent!",
-        description: `An invitation has been sent to ${phone.trim()}`
-      });
-
-      setPhone('');
-      setMessage('');
-      setIsOpen(false);
-    } catch (error: any) {
-      toast({
-        title: "Error sending invitation",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsInviting(false);
-    }
-  };
 
   const handleCreateShareableLink = async () => {
     setIsInviting(true);
@@ -314,12 +215,12 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
         <DialogHeader>
           <DialogTitle>Invite People to Trip</DialogTitle>
           <DialogDescription>
-            Send invitations via email, SMS, create shareable links, QR codes, or share on social media.
+            Create shareable links, QR codes, or share on social media.
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="link" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 text-xs">
+          <TabsList className="grid w-full grid-cols-3 text-xs">
             <TabsTrigger value="link" className="gap-1">
               <Link className="h-3 w-3" />
               <span className="hidden sm:inline">Link</span>
@@ -332,75 +233,7 @@ export const TripInviteDialog = ({ tripId }: TripInviteDialogProps) => {
               <QrCode className="h-3 w-3" />
               <span className="hidden sm:inline">QR</span>
             </TabsTrigger>
-            <TabsTrigger value="email" className="gap-1">
-              <Mail className="h-3 w-3" />
-              <span className="hidden sm:inline">Email</span>
-            </TabsTrigger>
-            <TabsTrigger value="phone" className="gap-1">
-              <Phone className="h-3 w-3" />
-              <span className="hidden sm:inline">SMS</span>
-            </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="email" className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="friend@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Personal Message (Optional)</Label>
-              <Textarea
-                id="message"
-                placeholder="Join me for an amazing trip!"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={3}
-              />
-            </div>
-            <Button 
-              onClick={handleInviteByEmail} 
-              className="w-full" 
-              disabled={isInviting}
-            >
-              {isInviting ? "Sending..." : "Send Email Invitation"}
-            </Button>
-          </TabsContent>
-          
-          <TabsContent value="phone" className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message-sms">Personal Message (Optional)</Label>
-              <Textarea
-                id="message-sms"
-                placeholder="Join me for an amazing trip!"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={3}
-              />
-            </div>
-            <Button 
-              onClick={handleInviteByPhone} 
-              className="w-full" 
-              disabled={isInviting}
-            >
-              {isInviting ? "Sending..." : "Send SMS Invitation"}
-            </Button>
-          </TabsContent>
           
           <TabsContent value="link" className="space-y-4 mt-4">
             {!shareableLink ? (
