@@ -49,32 +49,41 @@ Your iOS app is **100% ready to build!** Follow these steps to get WanderTogethe
 
 ---
 
-### Step 3: Open the iOS Project in Xcode
+### Step 3: Install Node Dependencies FIRST! ⚠️
 
-1. **Open Finder** and navigate to your project folder
-2. Go into: `ios/App/`
-3. **Double-click `App.xcworkspace`**
-   - ⚠️ **Important:** Open `.xcworkspace` NOT `.xcodeproj`
-   - The workspace file includes all dependencies
-
-4. Xcode will open and show your project
-5. **Wait for indexing to complete** (watch the top progress bar)
-   - This takes 1-2 minutes the first time
-   - You'll see "Indexing..." then it disappears when done
-
----
-
-### Step 4: Install CocoaPods Dependencies
-
-The iOS project needs to install native dependencies first.
+**IMPORTANT:** The downloaded ZIP doesn't include `node_modules` (too large). You must install dependencies first!
 
 1. **Open Terminal** on your Mac (Applications → Utilities → Terminal)
 
+2. **Navigate to your project folder:**
+   ```bash
+   cd ~/Documents/WanderTogether
+   ```
+   (Adjust path if you put it somewhere else)
+
+3. **Install all dependencies:**
+   ```bash
+   npm install
+   ```
+   - This takes 2-5 minutes
+   - Downloads all packages including @capacitor/ios
+   - You'll see progress bars
+   - Wait for "added XXX packages" message
+
+✅ **Critical step - don't skip this!**
+
+---
+
+### Step 4: Install iOS CocoaPods Dependencies
+
+Now install the iOS native dependencies.
+
+1. **In Terminal (still open from Step 3):**
+
 2. **Navigate to the iOS folder:**
    ```bash
-   cd ~/Documents/WanderTogether/ios/App
+   cd ios/App
    ```
-   (Adjust the path if you put it somewhere else)
 
 3. **Install CocoaPods (if not already installed):**
    ```bash
@@ -91,11 +100,26 @@ The iOS project needs to install native dependencies first.
    - Takes 1-2 minutes
    - You'll see "Pod installation complete!"
 
-✅ **Done! Close Terminal, go back to Xcode**
+✅ **Done!**
 
 ---
 
-### Step 5: Configure App Signing
+### Step 5: Open the iOS Project in Xcode
+
+1. **Open Finder** and navigate to your project folder
+2. Go into: `ios/App/`
+3. **Double-click `App.xcworkspace`**
+   - ⚠️ **Important:** Open `.xcworkspace` NOT `.xcodeproj`
+   - The workspace file includes all dependencies
+
+4. Xcode will open and show your project
+5. **Wait for indexing to complete** (watch the top progress bar)
+   - This takes 1-2 minutes the first time
+   - You'll see "Indexing..." then it disappears when done
+
+---
+
+### Step 6: Configure App Signing
 
 1. **In Xcode, select the "App" project** (top of left sidebar)
 2. **Click on the "App" target** (under "TARGETS" in main area)
@@ -117,7 +141,7 @@ You'll see: ✅ **"Signing for 'App' requires a development team..."** → Fixed
 
 ---
 
-### Step 6: Connect Your iPhone 16
+### Step 7: Connect Your iPhone 16
 
 1. **Unlock your iPhone 16**
 2. **Connect it to your Mac** using USB cable
@@ -131,7 +155,7 @@ You'll see: ✅ **"Signing for 'App' requires a development team..."** → Fixed
 
 ---
 
-### Step 7: Build and Run! 🎉
+### Step 8: Build and Run! 🎉
 
 1. **Click the big Play button** (▶) in top left of Xcode
    - Or press `Cmd + R`
