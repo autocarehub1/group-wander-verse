@@ -59,15 +59,15 @@ const Features = () => {
       
       <div className="container mx-auto px-6 relative z-10">
         {/* Hero section with image */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
-          <div>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 gradient-text">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center mb-12 lg:mb-20">
+          <div className="px-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 gradient-text leading-tight">
               Everything You Need for Group Travel
             </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed mb-8">
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed mb-6 sm:mb-8">
               From planning to memories, WanderTogether has all the tools to make your group adventures seamless and unforgettable.
             </p>
-            <Button variant="hero" size="xl" className="shadow-glow">
+            <Button variant="hero" size="xl" className="shadow-glow w-full sm:w-auto" data-testid="button-explore-features">
               Explore Features
             </Button>
           </div>
@@ -82,21 +82,21 @@ const Features = () => {
         </div>
 
         {/* Features grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 lg:mb-20 px-4">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
-              <Card key={index} className="travel-card group border-0 bg-white/90 backdrop-blur-md hover:bg-white/95">
-                <CardHeader className="text-center pb-4">
-                  <div className="relative mx-auto mb-6 w-20 h-20 rounded-3xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+              <Card key={index} className="travel-card group border-0 bg-white/90 backdrop-blur-md hover:bg-white/95" data-testid={`card-feature-${index}`}>
+                <CardHeader className="text-center pb-3 sm:pb-4">
+                  <div className="relative mx-auto mb-4 sm:mb-6 w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
                     <div className="absolute inset-0 bg-gradient-hero rounded-3xl opacity-20"></div>
                     <div className="absolute inset-0 bg-white/50 rounded-3xl"></div>
-                    <IconComponent className={`relative z-10 ${feature.color} group-hover:scale-110 transition-transform`} size={36} />
+                    <IconComponent className={`relative z-10 ${feature.color} group-hover:scale-110 transition-transform`} size={32} />
                   </div>
-                  <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors">{feature.title}</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl mb-2 group-hover:text-primary transition-colors px-2">{feature.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
-                  <CardDescription className="text-base leading-relaxed">
+                <CardContent className="text-center px-4">
+                  <CardDescription className="text-sm sm:text-base leading-relaxed">
                     {feature.description}
                   </CardDescription>
                 </CardContent>

@@ -282,45 +282,47 @@ export const ActivitySuggestions = ({ tripId }: ActivitySuggestionsProps) => {
       ) : (
         <div className="grid gap-4">
           {activities.map((activity) => (
-            <Card key={activity.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      {activity.title}
-                      <Badge variant="outline">{activity.category}</Badge>
-                    </CardTitle>
+            <Card key={activity.id} data-testid={`card-activity-${activity.id}`}>
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <CardTitle className="text-base sm:text-lg truncate">{activity.title}</CardTitle>
+                      <Badge variant="outline" className="text-xs whitespace-nowrap">{activity.category}</Badge>
+                    </div>
                     {activity.description && (
-                      <CardDescription>{activity.description}</CardDescription>
+                      <CardDescription className="text-xs sm:text-sm line-clamp-2">{activity.description}</CardDescription>
                     )}
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => deleteActivity(activity.id)}
+                    className="flex-shrink-0"
+                    data-testid={`button-delete-activity-${activity.id}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <CardContent className="pt-0">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     {activity.location && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {activity.location}
+                      <div className="flex items-center gap-1 whitespace-nowrap">
+                        <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                        <span className="truncate max-w-[150px]">{activity.location}</span>
                       </div>
                     )}
                     {activity.estimated_duration && (
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
+                      <div className="flex items-center gap-1 whitespace-nowrap">
+                        <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                         {activity.estimated_duration}h
                       </div>
                     )}
                     {activity.estimated_cost && (
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
+                      <div className="flex items-center gap-1 whitespace-nowrap">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
                         ${activity.estimated_cost}
                       </div>
                     )}

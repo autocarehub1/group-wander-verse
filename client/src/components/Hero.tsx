@@ -24,12 +24,12 @@ const Hero = () => {
               className="w-24 h-24 md:w-32 md:h-32 object-contain animate-float"
             />
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight px-2">
             <span className="block mb-2">Wander</span>
             <span className="gradient-text">Together</span>
           </h1>
           
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 text-white/90 max-w-2xl mx-auto leading-relaxed px-4">
             Plan unforgettable group adventures with friends. Collaborate, coordinate, and create memories that last a lifetime.
           </p>
 

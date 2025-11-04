@@ -41,15 +41,15 @@ export const TripCard = ({ trip, onManageGroup }: TripCardProps) => {
   return (
     <Card className="cursor-pointer hover:shadow-lg transition-shadow">
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="line-clamp-1">{trip.title}</CardTitle>
-            <CardDescription className="flex items-center gap-1 mt-1">
-              <MapPin className="h-3 w-3" />
-              {trip.destination}
+        <div className="flex justify-between items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="line-clamp-1 text-base sm:text-lg">{trip.title}</CardTitle>
+            <CardDescription className="flex items-center gap-1 mt-1 truncate text-xs sm:text-sm">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{trip.destination}</span>
             </CardDescription>
           </div>
-          <Badge className={getStatusColor(trip.status ?? undefined)} variant="outline">
+          <Badge className={`${getStatusColor(trip.status ?? undefined)} whitespace-nowrap text-xs`} variant="outline">
             {trip.status || 'planning'}
           </Badge>
         </div>
@@ -82,14 +82,15 @@ export const TripCard = ({ trip, onManageGroup }: TripCardProps) => {
             variant="outline"
             size="sm"
             onClick={() => onManageGroup(trip.id)}
-            className="w-full"
+            className="w-full text-xs sm:text-sm"
+            data-testid={`button-manage-group-${trip.id}`}
           >
-            <Users className="h-4 w-4 mr-2" />
-            Manage Group
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Manage </span>Group
           </Button>
           <Link to={`/trips/${trip.id}/activities`}>
-            <Button variant="outline" size="sm" className="w-full">
-              <Compass className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="sm" className="w-full text-xs sm:text-sm" data-testid={`button-activities-${trip.id}`}>
+              <Compass className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Activities
             </Button>
           </Link>
