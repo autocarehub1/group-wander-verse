@@ -18,6 +18,7 @@ import GroupChatPage from "./pages/GroupChatPage";
 import Settings from "./pages/Settings";
 import ActivityPlanning from "./pages/ActivityPlanning";
 import PaymentVerification from "./pages/PaymentVerification";
+import TripDetail from "./pages/TripDetail";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,11 @@ const App = () => (
             <Route path="/trips" element={
               <ProtectedRoute>
                 <Trips />
+              </ProtectedRoute>
+            } />
+            <Route path="/trips/:tripId" element={
+              <ProtectedRoute>
+                <TripDetail />
               </ProtectedRoute>
             } />
 
