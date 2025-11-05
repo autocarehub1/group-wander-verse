@@ -160,25 +160,25 @@ const ExpensePayments = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-6">
           {tripId && trip ? (
             <Link to={`/trips/${tripId}`}>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2" data-testid="button-back-to-trip">
                 <ArrowLeft size={16} />
                 Back to Trip
               </Button>
             </Link>
           ) : (
             <Link to="/">
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2" data-testid="button-back-to-dashboard">
                 <ArrowLeft size={16} />
                 Back to Dashboard
               </Button>
             </Link>
           )}
           <div className="flex-1">
-            <h1 className="text-3xl font-bold gradient-text">Payment Center</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Payment Center</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               {tripId && trip 
                 ? `Manage your share of group expenses for ${trip.destination}`
                 : 'Manage all your pending payments across trips'
