@@ -1702,7 +1702,7 @@ Happy travels!
       // Import Stripe dynamically
       const Stripe = (await import('stripe')).default;
       const stripe = new Stripe(stripeSecretKey, {
-        apiVersion: '2025-07-30.basil',
+        apiVersion: '2025-08-27.basil',
       });
 
       // Check if customer exists
