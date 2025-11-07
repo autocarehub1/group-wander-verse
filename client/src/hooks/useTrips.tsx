@@ -159,10 +159,10 @@ export const useTrips = () => {
 
   const deleteTrip = async (tripId: string) => {
     try {
-      const { error } = await supabase
-        .from('trips')
-        .delete()
-        .eq('id', tripId);
+      const response = await fetch(`/api/trips/${tripId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete trip');
 
       if (error) throw error;
 
