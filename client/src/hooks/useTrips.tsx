@@ -164,8 +164,6 @@ export const useTrips = () => {
       });
       if (!response.ok) throw new Error('Failed to delete trip');
 
-      if (error) throw error;
-
       await fetchTrips();
       
       toast({
