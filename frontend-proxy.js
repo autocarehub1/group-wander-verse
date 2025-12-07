@@ -1,6 +1,6 @@
 // Simple proxy to forward requests from port 3000 to port 8001
-const http = require('http');
-const httpProxy = require('http-proxy');
+import http from 'http';
+import httpProxy from 'http-proxy';
 
 const proxy = httpProxy.createProxyServer({
   target: 'http://localhost:8001',
