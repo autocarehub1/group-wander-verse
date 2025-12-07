@@ -51,4 +51,7 @@ attached_assets/
 # Android keystore (sensitive)
 *.jks
 *.keystore
-keystore.properties
+keystore.properties-e 
+# Environment files
+*.env
+*.env.*
